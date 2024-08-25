@@ -17,7 +17,7 @@ export default function Profile() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center p-24">
       <div>
         <h1 className="text-3xl font-bold mb-4">
           Welcome, {session?.user?.email}!

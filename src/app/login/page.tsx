@@ -1,8 +1,13 @@
 "use client";
-
+// general imports
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+// shadcn ui
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -36,7 +41,7 @@ export default function Login() {
       <div>
         <h1 className="text-3xl font-bold mb-4">Login</h1>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-          <input
+          <Input
             type="email"
             placeholder="Email"
             value={email}
@@ -44,7 +49,7 @@ export default function Login() {
             className="border p-2 rounded"
             required
           />
-          <input
+          <Input
             type="password"
             placeholder="Password"
             value={password}
@@ -53,12 +58,12 @@ export default function Login() {
             required
           />
           {error && <p className="text-red-500">{error}</p>}
-          <button
+          <Button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Sign In
-          </button>
+          </Button>
         </form>
       </div>
     </main>
