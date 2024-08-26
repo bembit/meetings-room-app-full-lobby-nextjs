@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import "./globals.css";
 import Providers from "./providers";
 import { ThemeProvider } from "@/components/theme-provider"
+// import ThemeWrapper from "@/components/ThemeWrapper";
 
 
 const fontSans = FontSans({
@@ -30,14 +31,16 @@ export default function RootLayout({
         )}
       >
         <Providers>
+          {/* app-index.js:33 Warning: Extra attributes from the server: class,style */}
           <ThemeProvider
               attribute="class"
               defaultTheme="system"
               enableSystem
               disableTransitionOnChange
             >
-          {children}
+              {children}
           </ThemeProvider>
+          {/* <ThemeWrapper>{children}</ThemeWrapper> */}
         </Providers> 
       </body>
     </html>
