@@ -1,8 +1,6 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from 'next/navigation';
-import SignOutButton from "@/components/SignOutButton";
-import DropdownMenuDemo from "@/components/DropdownMenuDemo";
 import Nav from "@/components/Nav";
 
 export default async function Profile() {

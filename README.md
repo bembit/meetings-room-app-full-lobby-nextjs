@@ -1,3 +1,3 @@
-### rate limiting
+#### this user page is quite wonky with sessions.
 
-### captcha
+authOptions errors on build.

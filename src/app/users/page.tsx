@@ -1,43 +1,23 @@
-'use client';
-
-import { useState, useEffect } from "react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import connectDB from "@/lib/db";
+import User from "@/models/User";
 import Nav from "@/components/Nav";
-import Loading from "@/components/Loading";
 import HoverCardDemo from "@/components/HoverCardDemo";
+import Link from "next/link";
 
-export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]); // Adjust the type as needed based on your User model
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default async function UsersPage() {
+  const session = await getServerSession(authOptions);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/users");
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
-        } else {
-          setError("Failed to fetch users.");
-        }
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        setError("An unexpected error occurred.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  if (isLoading) {
-    return <Loading />;
+  // If no session exists, redirect to login page
+  if (!session) {
+    redirect("/");
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  await connectDB();
+
+  const users = await User.find({}, "email encodedId").limit(10); // Fetch the encoded ID and email
 
   return (
     <main className="flex min-h-screen flex-col items-center">
@@ -45,8 +25,14 @@ export default function UsersPage() {
       <h1 className="text-3xl font-bold mb-4">Registered Users</h1>
       <ul>
         {users.map((user) => (
-          <HoverCardDemo key={user._id} email={user.email} />
-          // <li key={user._id}>{user.email}</li>
+          <li key={user._id} className="p-4 border border-gray-200 mb-2 rou">
+            <Link href={`/users/${user._id}`} passHref legacyBehavior>
+              <a>
+                {/* this will be hover only query for a short profile */}
+                <HoverCardDemo email={user.email} />
+              </a>
+            </Link>
+          </li>
         ))}
       </ul>
     </main>

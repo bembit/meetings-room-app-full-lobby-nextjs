@@ -1,19 +1,21 @@
-import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import User from "@/models/User";
+// fetch users in component
 
-export async function GET(request: Request) {
-  try {
-    await connectDB();
+// import { NextResponse } from "next/server";
+// import connectDB from "@/lib/db";
+// import User from "@/models/User";
 
-    const users = await User.find({}, 'email'); // Fetch only the email field
+// export async function GET(request: Request) {
+//   try {
+//     await connectDB();
 
-    return NextResponse.json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return NextResponse.json(
-      { error: "An error occurred while fetching users" },
-      { status: 500 }
-    );
-  }
-}
+//     const users = await User.find({}, 'email'); // Fetch only the email field
+
+//     return NextResponse.json(users);
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//     return NextResponse.json(
+//       { error: "An error occurred while fetching users" },
+//       { status: 500 }
+//     );
+//   }
+// }
