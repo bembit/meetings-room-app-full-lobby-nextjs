@@ -1,33 +1,24 @@
-'use client';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from 'next/navigation';
+import SignOutButton from "@/components/SignOutButton";
+import DropdownMenuDemo from "@/components/DropdownMenuDemo";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-
-export default function Profile() {
-  const { data: session } = useSession();
-  const router = useRouter();
+export default async function Profile() {
+  const session = await getServerSession(authOptions);
 
   if (!session) {
-    router.push("/login");
-    return null;
+    redirect("/login");
   }
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/' }); 
-  };
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div>
+        <DropdownMenuDemo session={session} /> {/* Use the DropdownMenuDemo component */}
         <h1 className="text-3xl font-bold mb-4">
           Welcome, {session?.user?.email}!
         </h1>
-        <button
-          onClick={handleSignOut}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Sign Out
-        </button>
+        {/* <SignOutButton /> Use the SignOutButton component */}
       </div>
     </main>
   );
