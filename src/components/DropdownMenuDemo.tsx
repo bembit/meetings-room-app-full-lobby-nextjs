@@ -32,19 +32,21 @@ import {
   } from "@/components/ui/dropdown-menu"
 
 interface DropdownMenuDemoProps {
-  session: any; // Or define a more specific type for your session data
+  // session: any;
+  email: string;
+  name?: string;
 }
 
 import SignOutButton from "@/components/SignOutButton"
 
-  export default function DropdownMenuDemo({ session }: DropdownMenuDemoProps) {
+  export default function DropdownMenuDemo({ email, name }: DropdownMenuDemoProps) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">{session?.user?.email || "Profile"}</Button>
+          <Button variant="outline">{email || "Profile"}</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{name || "My Account"}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>

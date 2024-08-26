@@ -19,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import Nav from "@/components/Nav";
+
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long." })
   .regex(/[0-9]/, { message: "Password must contain at least one number." })
@@ -34,6 +36,7 @@ const formSchema = z.object({
 
 export default function Register() {
   const [emailError, setEmailError] = useState(null);
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -88,7 +91,7 @@ export default function Register() {
       });
 
       if (response.ok) {
-        router.push("/login");
+        router.push("/");
       } else {
         const data = await response.json();
         setError(data.error || "An error occurred during registration.");
@@ -100,7 +103,8 @@ export default function Register() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex min-h-screen flex-col items-center">
+      <Nav />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -110,7 +114,7 @@ export default function Register() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="email" {...field} />
+                  <Input className="block" placeholder="email" {...field} />
                 </FormControl>
                 <FormDescription>
                   This is your private email address.
