@@ -4,8 +4,10 @@ import { redirect } from 'next/navigation';
 import DropdownMenuDemo from "@/components/DropdownMenuDemo";
 import Nav from "@/components/Nav";
 
+import type { Session } from "next-auth";
+
 export default async function Profile() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as Session | null;
 
   if (!session) {
     redirect("/");

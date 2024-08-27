@@ -100,7 +100,8 @@ export default function Home() {
             </form>
 
             <p className="mt-4">
-              Don't have an account?{" "}
+              {/* escape apostrophe */}
+              Don&apos;t have an account?{" "}
               <Button
                 onClick={handleRegister}
                 className="hover:bg-transparent bg-transparent text-blue-500 font-bold underline"

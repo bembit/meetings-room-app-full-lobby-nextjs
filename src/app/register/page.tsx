@@ -34,9 +34,21 @@ const formSchema = z.object({
   password: passwordSchema,
 });
 
+interface CheckEmailResponse {
+  available: boolean;
+}
+
+interface RegisterSuccessResponse {
+  message: string; 
+}
+
+interface RegisterErrorResponse {
+  error: string;
+}
+
 export default function Register() {
   const [emailError, setEmailError] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,7 +62,7 @@ export default function Register() {
   const debouncedEmail = useDebounce(form.watch("email"), 500);
 
   useEffect(() => {
-    const checkEmailAvailability = async (email) => {
+    const checkEmailAvailability = async (email: string) => {
       if (formSchema.shape.email.safeParse(email).success) {
         try {
           const response = await fetch(`/api/check-email`, {
@@ -61,7 +73,7 @@ export default function Register() {
             body: JSON.stringify({ email }),
           });
 
-          const data = await response.json();
+          const data = await response.json() as CheckEmailResponse;
           if (response.ok && !data.available) {
             // setEmailError("Email is already taken.");
             form.setError("email", { type: "server", message: "Email is already taken." });
@@ -78,7 +90,8 @@ export default function Register() {
     if (debouncedEmail) {
       checkEmailAvailability(debouncedEmail);
     }
-  }, [debouncedEmail]);
+    // form added
+  }, [debouncedEmail, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -89,11 +102,14 @@ export default function Register() {
         },
         body: JSON.stringify(values),
       });
-
+  
       if (response.ok) {
+        const data = await response.json() as RegisterSuccessResponse; 
+        // use a toast notification or other UI feedback later
+        console.log(data.message);
         router.push("/");
       } else {
-        const data = await response.json();
+        const data = await response.json() as RegisterErrorResponse;
         setError(data.error || "An error occurred during registration.");
       }
     } catch (err) {
