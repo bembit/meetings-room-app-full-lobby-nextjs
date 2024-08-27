@@ -140,6 +140,14 @@ export function NavigationMenuDemo() {
 
         <NavigationMenuItem>DEBUG</NavigationMenuItem>
 
+        <NavigationMenuItem>
+          <Link href="/create-room" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Create
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
         {session && (
             <>
              <NavigationMenuItem>
