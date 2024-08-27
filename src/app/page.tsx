@@ -1,7 +1,7 @@
 "use client";
 
 import { getSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import Nav from "@/components/Nav";
@@ -12,13 +12,15 @@ import { Label } from "@/components/ui/label";
 
 import Loading from "@/components/Loading";
 
+import type { Session } from "next-auth";
+
 export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [session, setSession] = useState(null); // State to hold session data
-  const [loading, setLoading] = useState(true); // State to show loading while session is being checked
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Check if the user is logged in on component mount
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function Home() {
     router.push("/register"); 
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const result = await signIn("credentials", {
@@ -45,13 +47,15 @@ export default function Home() {
 
     if (!result?.error) {
       router.push("/profile");
+      // router.push("/");
+      // redirect("/");
     } else {
       setError(result.error);
     }
   };
 
   if (loading) {
-    return <Loading />; // You can customize this with a loading spinner
+    return <Loading />;
   }
 
   return (
