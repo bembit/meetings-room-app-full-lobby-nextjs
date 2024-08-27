@@ -1,3 +1,6 @@
 #### this user page is quite wonky with sessions.
 
-authOptions errors on build.
+- [x] authOptions errors on build.
+
+- [ ] !session stuff. 
+- [ ] check the navigation / dropdown

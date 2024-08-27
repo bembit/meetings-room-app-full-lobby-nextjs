@@ -14,11 +14,11 @@ export default function Profile() {
 
   useEffect(() => {
     if (status === "loading") {
-      setLoading(true);
+      setLoading(true);  // Show loading screen while session is loading
     } else if (status === "authenticated") {
-      setLoading(false);
+      setLoading(false);  // Session is available, stop loading
     } else if (status === "unauthenticated") {
-      router.push("/");
+      router.push("/");  // No session, redirect to home
     }
   }, [status, router]);
 
@@ -29,8 +29,7 @@ export default function Profile() {
   }
 
   if (!session) {
-    return null;
-    // redirect("/");
+    redirect("/");
   }
 
   const { email } = session.user;

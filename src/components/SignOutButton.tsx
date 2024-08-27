@@ -8,17 +8,8 @@ export default function SignOutButton() {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const data = await signOut({
-      redirect: false, 
-      callbackUrl: '/'
-    })
-
-    if (data?.error) {
-      console.error('Error signing out:', data.error);
-      // You might want to display an error message to the user here
-    } else {
-      router.push('/');
-    }
+    await signOut(); // Let NextAuth.js handle the default redirection
+    router.push('/'); 
   };
 
   return (
