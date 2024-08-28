@@ -17,7 +17,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
     // Find the room and update the participants array
     const room = await Room.findByIdAndUpdate(
       params.roomId,
-      { $addToSet: { participants: session.user.id } }, // Add user to participants if not already present
+      { $addToSet: { participants: session.user._id } }, // Add user to participants if not already present
       { new: true } // Return the updated room document
     );
 

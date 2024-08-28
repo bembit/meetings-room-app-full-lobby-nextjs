@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
+import Nav from "@/components/Nav";
+
 export default function CreateRoom() {
   const [roomName, setRoomName] = useState("");
   const [error, setError] = useState(null);
@@ -42,7 +44,8 @@ export default function CreateRoom() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
+    <main className="flex min-h-screen flex-col items-center">
+      <Nav />
       <div>
         <h1 className="text-3xl font-bold mb-4">Create a New Room</h1>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">

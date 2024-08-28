@@ -44,3 +44,20 @@ export async function POST(request: Request)  
     );
   }
 }
+
+export async function GET(request: Request) {
+  try {
+    await dbConnect();
+
+    const rooms = await Room.find()
+      .populate("creatorId", "email")
+
+    return NextResponse.json(rooms);
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+    return NextResponse.json(
+      { error: "An error occurred while fetching rooms" },
+      { status: 500 }
+    );
+  }
+}
