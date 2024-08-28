@@ -47,6 +47,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     // Only fetch room data if the user is authenticated
     if (status === "authenticated") {
       fetchRoomData();
+
+      const intervalId = setInterval(fetchRoomData, 5000); // Polling interval
+
+      // Clean up the interval on component unmount
+      return () => clearInterval(intervalId);
     }
   }, [params.roomId, session, router, status]); 
 
