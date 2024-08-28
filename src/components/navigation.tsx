@@ -112,7 +112,7 @@ export function NavigationMenuDemo() {
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        <NavigationMenuItem>DEBUG</NavigationMenuItem>
+        {/* <NavigationMenuItem>DEBUG</NavigationMenuItem>
 
         <NavigationMenuItem>
           <Link href="/dashboard" legacyBehavior passHref>
@@ -138,12 +138,20 @@ export function NavigationMenuDemo() {
           </Link>
         </NavigationMenuItem>
 
-        <NavigationMenuItem>DEBUG</NavigationMenuItem>
+        <NavigationMenuItem>DEBUG</NavigationMenuItem> */}
 
         <NavigationMenuItem>
           <Link href="/create-room" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Create
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link href="/rooms" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Rooms
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
@@ -157,13 +165,14 @@ export function NavigationMenuDemo() {
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            
+            {/* <NavigationMenuItem>
               <Link href="/dashboard" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   Dashboard
                 </NavigationMenuLink>
               </Link>
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
             </>
         )}      
       </NavigationMenuList>

@@ -4,6 +4,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import Nav from "@/components/Nav";
+
 export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -12,35 +15,35 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchRoomData = async () => {
-      try {
-        if (!session) { // Check if session is available
-          router.push("/");
-          return;
-        }
-
-        const response = await fetch(`/api/rooms/${params.roomId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setRoomData(data);
-          setIsParticipant(
-            data.participants.some(
-              // (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
-              (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
-            )
-          );
-        } else {
-          setError("Failed to fetch room data.");
-        }
-      } catch (err) {
-        console.error("Error fetching room data:", err);
-        setError("An unexpected error occurred.");
-      } finally {
-        setIsLoading(false);
+  const fetchRoomData = async () => {
+    try {
+      if (!session) { // Check if session is available
+        router.push("/");
+        return;
       }
-    };
 
+      const response = await fetch(`/api/rooms/${params.roomId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setRoomData(data);
+        setIsParticipant(
+          data.participants.some(
+            // (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
+            (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
+          )
+        );
+      } else {
+        setError("Failed to fetch room data.");
+      }
+    } catch (err) {
+      console.error("Error fetching room data:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     // Only fetch room data if the user is authenticated
     if (status === "authenticated") {
       fetchRoomData();
@@ -57,7 +60,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       if (response.ok) {
         setIsParticipant(true);
         // Optionally, you can refetch the room data to update the participant list
-        // await fetchRoomData();
+        await fetchRoomData();
       } else {
         const data = await response.json();
         console.error("Error joining room:", data.error);
@@ -78,7 +81,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       if (response.ok) {
         setIsParticipant(false);
         // Optionally, you can refetch the room data to update the participant list
-        // await fetchRoomData();
+        await fetchRoomData();
       } else {
         const data = await response.json();
         console.error("Error leaving room:", data.error);
@@ -90,10 +93,43 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
+  const handleKickUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/kick/${userId}`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        // Refetch room data or update the participant list locally
+        await fetchRoomData();
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
+  const handleDeleteRoom = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/delete`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        router.push('/rooms'); // Redirect to the rooms list after deletion
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
   if (status === "loading" || isLoading) {
     return <div>Loading...</div>;
   } else if (status === "unauthenticated") {
-    router.push("/login");
+    router.push("/");
     return null;
   }
 
@@ -102,11 +138,15 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
+    <main className="flex min-h-screen flex-col items-center">
+      <Nav />
       <div>
         <h1 className="text-3xl font-bold mb-4">
           Room name: {roomData?.name}
         </h1>
+        {session?.user?._id === roomData?.creatorId?._id && (
+          <Button onClick={handleDeleteRoom}>Delete Room</Button>
+        )}
         <p>
           Owner:{" "}
           {roomData?.creatorId?.email || "Unknown"}
@@ -115,85 +155,27 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         <h2>Participants:</h2>
         <ul>
           {roomData?.participants.map((participant) => (
-            <li key={participant._id.toString()}>{participant.email}</li>
+            <li key={participant._id.toString()}>
+              {participant.email}
+              {/* Conditionally render the Kick button */}
+              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
+                <Button onClick={() => handleKickUser(participant._id.toString())}>
+                  Kick
+                </Button>
+              )}
+            </li>
           ))}
         </ul>
 
         {!isParticipant && (
-          <button onClick={handleJoinRoom}>Join Room</button>
+          <Button onClick={handleJoinRoom}>Join Room</Button>
         )}
 
         {isParticipant && (
-          <button onClick={handleLeaveRoom}>Leave Room</button>
+          <Button onClick={handleLeaveRoom}>Leave Room</Button>
         )}
         {/* isCreator should be able to delete the room */}
       </div>
     </main>
   );
 }
-
-
-
-// 'use client';
-
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
-// import { useEffect, useState } from "react";
-
-// export default function RoomPage({ params }: { params: { roomId: string } }) {
-//   const { data: session, status } = useSession();
-//   const router = useRouter();
-//   const [roomData, setRoomData] = useState<any>(null);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchRoomData = async () => {
-//       try {
-//         if (!session) {
-//           router.push("/"); 
-//           return;
-//         }
-
-//         const response = await fetch(`/api/rooms/${params.roomId}`);
-//         if (response.ok) {
-//           const data = await response.json();
-//           setRoomData(data);
-//         } else {
-//           setError("Failed to fetch room data.");
-//         }
-//       } catch (err) {
-//         console.error("Error fetching room data:", err);
-//         setError("An unexpected error occurred.");
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-//     if (status === "authenticated") {
-//       fetchRoomData();
-//     }
-//   }, [params.roomId, session, router]);
-
-//   if (status === "loading" || isLoading) {
-//     return <div>Loading...</div>;
-//   } else if (status === "unauthenticated") {
-//     router.push("/login");
-//     return null;
-//   }
-
-//   if (error) {
-//     return <div>Error: {error}</div>;
-//   }
-
-//   // Temporary: Display basic room information for now
-//   return (
-//     <main className="flex min-h-screen flex-col items-center p-24">
-//       <div>
-//         <h1 className="text-3xl font-bold mb-4">
-//           Room name: {roomData?.name}
-//         </h1>
-//         {/* We'll add more details and functionality in the next steps */}
-//       </div>
-//     </main>
-//   );
-// }

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import Nav from "@/components/Nav";
 import HoverCardDemo from "@/components/HoverCardDemo";
@@ -15,9 +15,9 @@ export default async function UsersPage() {
     redirect("/");
   }
 
-  await connectDB();
+  await dbConnect();
 
-  const users = await User.find({}, "email encodedId").limit(10); // Fetch the encoded ID and email
+  const users = await User.find({}, "email").limit(10); // Fetch the encoded ID and email
 
   return (
     <main className="flex min-h-screen flex-col items-center">
