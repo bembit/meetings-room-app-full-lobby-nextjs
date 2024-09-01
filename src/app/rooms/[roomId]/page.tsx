@@ -131,6 +131,40 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
+  const handleJoinSide1 = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/join-side-1`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        await fetchRoomData(); 
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
+  const handleJoinSide2 = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/join-side-2`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        await fetchRoomData(); 
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
+  // ... (rest of your component code)
+
   if (status === "loading" || isLoading) {
     return <div>Loading...</div>;
   } else if (status === "unauthenticated") {
@@ -171,6 +205,29 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             </li>
           ))}
         </ul>
+
+        {/* sides test */}
+          <h2>Side 1:</h2>
+          <ul>
+            {roomData?.side1?.map((participant) => (
+              <li key={participant._id.toString()}>{participant.email}</li>
+            ))}
+          </ul>
+
+          <h2>Side 2:</h2>
+          <ul>
+            {roomData?.side2?.map((participant) => (
+              <li key={participant._id.toString()}>{participant.email}</li>
+            ))}
+          </ul>
+
+          {/* Conditionally render Join Side buttons if the user is in the lobby */}
+          {isParticipant && (
+            <>
+              <button onClick={handleJoinSide1}>Join Side 1</button>
+              <button onClick={handleJoinSide2}>Join Side 2</button>
+            </>
+          )}
 
         {!isParticipant && (
           <Button onClick={handleJoinRoom}>Join Room</Button>

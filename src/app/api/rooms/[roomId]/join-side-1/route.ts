@@ -14,23 +14,21 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     await dbConnect();
 
-    // Find the room and update the participants array
     const room = await Room.findByIdAndUpdate(
       params.roomId,
-      { $addToSet: { participants: session.user._id } }, // Add user to participants if not already present
-      { new: true } // Return the updated room document
+      {
+        $addToSet: { side1: session.user._id }, 
+        $pull: { participants: session.user._id } // Remove from lobby
+      },
+      { new: true }
     );
 
     if (!room) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Joined room successfully" });
+    return NextResponse.json({ message: "Joined side 1 successfully" });
   } catch (error) {
-    console.error("Error joining room:", error);
-    return NextResponse.json(
-      { error: "An error occurred while joining the room" },
-      { status: 500 }
-    );
+    // ... error handling
   }
 }
