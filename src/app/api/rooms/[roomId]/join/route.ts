@@ -15,6 +15,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
     await dbConnect();
 
     // Find the room and update the participants array
+    // need to validate if the user is already in a side
     const room = await Room.findByIdAndUpdate(
       params.roomId,
       { $addToSet: { participants: session.user._id } }, // Add user to participants if not already present

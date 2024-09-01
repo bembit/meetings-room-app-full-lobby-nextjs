@@ -30,7 +30,9 @@ export async function POST(request: Request)  
       name,
       // revisit tomorrow
       creatorId: new mongoose.Types.ObjectId(creatorId),
-      participants: participants.map(participantId => new mongoose.Types.ObjectId(participantId))
+      participants: participants.map(participantId => new mongoose.Types.ObjectId(participantId)),
+      side1: [],
+      side2: [],
     });
     
     await newRoom.save();

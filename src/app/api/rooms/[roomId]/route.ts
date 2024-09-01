@@ -8,7 +8,9 @@ export async function GET(request: Request, { params }: { params: { roomId: stri
 
     const room = await Room.findById(params.roomId)
       .populate("creatorId", "email")
-      .populate("participants", "email");
+      .populate("participants", "email")
+      .populate("side1", "email")
+      .populate("side2", "email");
 
     if (!room) {
       return new Response("Room not found", { status: 404 });

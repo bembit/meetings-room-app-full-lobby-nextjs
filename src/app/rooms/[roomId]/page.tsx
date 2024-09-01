@@ -186,13 +186,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         {session?.user?._id === roomData?.creatorId?._id && (
           <Button onClick={handleDeleteRoom}>Delete Room</Button>
         )}
-        <p>
+        <div className="flex flex-col space-y-2 p-4 underline">
           Owner:{" "}
           {roomData?.creatorId?.email || "Unknown"}
-        </p>
+        </div>
 
-        <h2>Participants:</h2>
-        <ul>
+        <h2>Participants to choose side:</h2>
+        <ul className="flex flex-col space-y-2 p-4">
           {roomData?.participants.map((participant) => (
             <li key={participant._id.toString()}>
               {participant.email}
@@ -208,15 +208,15 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
         {/* sides test */}
           <h2>Side 1:</h2>
-          <ul>
-            {roomData?.side1?.map((participant) => (
+          <ul className="flex flex-col space-y-2 p-4">
+            {roomData?.side1.map((participant) => (
               <li key={participant._id.toString()}>{participant.email}</li>
             ))}
           </ul>
 
           <h2>Side 2:</h2>
-          <ul>
-            {roomData?.side2?.map((participant) => (
+          <ul className="flex flex-col space-y-2 p-4">
+            {roomData?.side2.map((participant) => (
               <li key={participant._id.toString()}>{participant.email}</li>
             ))}
           </ul>
