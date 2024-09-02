@@ -18,7 +18,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       params.roomId,
       {
         $addToSet: { side1: session.user._id }, 
-        $pull: { participants: session.user._id } // Remove from lobby
+        $pull: { participants: session.user._id, side2: session.user._id, } // Remove from lobby
       },
       { new: true }
     );

@@ -163,7 +163,12 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
-  // ... (rest of your component code)
+  const isOnSide1 = roomData?.side1.some(
+    (participant) => participant._id.toString() === session?.user?._id
+  );
+  const isOnSide2 = roomData?.side2.some(
+    (participant) => participant._id.toString() === session?.user?._id
+  );
 
   if (status === "loading" || isLoading) {
     return <div>Loading...</div>;
@@ -224,10 +229,14 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           {/* Conditionally render Join Side buttons if the user is in the lobby */}
           {isParticipant && (
             <>
-              <button onClick={handleJoinSide1}>Join Side 1</button>
-              <button onClick={handleJoinSide2}>Join Side 2</button>
+              <Button onClick={handleJoinSide1}>Join Side 1</Button>
+              <Button onClick={handleJoinSide2}>Join Side 2</Button>
             </>
           )}
+
+          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
+          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> }
+
 
         {!isParticipant && (
           <Button onClick={handleJoinRoom}>Join Room</Button>
@@ -236,7 +245,25 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         {isParticipant && (
           <Button onClick={handleLeaveRoom}>Leave Room</Button>
         )}
-        {/* isCreator should be able to delete the room */}
+
+          {/* {isParticipant && (
+            <>
+              <Button onClick={handleJoinSide1}>Join Side 1</Button>
+              <Button onClick={handleJoinSide2}>Join Side 2</Button>
+            </>
+          )}
+
+          {!isParticipant || !isOnSide1 || !isOnSide2 && (
+            <Button onClick={handleJoinRoom}>Join Room</Button>
+          )}
+
+          {isParticipant || isOnSide1 || isOnSide2 && (
+            <Button onClick={handleLeaveRoom}>Leave Room</Button>
+          )}
+
+          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
+          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> } */}
+          
       </div>
     </main>
   );

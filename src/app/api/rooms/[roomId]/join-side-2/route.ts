@@ -1,17 +1,24 @@
-// app/api/rooms/[roomId]/join-side1/route.ts
 import { NextResponse } from "next/server";
-// ... other imports
+import dbConnect from "@/lib/db";
+import Room from "@/models/Room";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../../auth/[...nextauth]/route";
 
 export async function POST(request: Request, { params }: { params: { roomId: string } }) {
   try {
-    // ... (authentication and database connection logic)
+    const session = await getServerSession(authOptions);
 
-    // Find the room and update the side1 array
+    if (!session) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
+    await dbConnect();
+
     const room = await Room.findByIdAndUpdate(
       params.roomId,
       {
-        $addToSet: { side2: session.user.id }, 
-        $pull: { participants: session.user.id } // Remove from lobby
+        $addToSet: { side2: session.user._id }, 
+        $pull: { participants: session.user._id, side1: session.user._id, } // Remove from lobby
       },
       { new: true }
     );
@@ -20,7 +27,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Joined side 1 successfully" });
+    return NextResponse.json({ message: "Joined side 2 successfully" });
   } catch (error) {
     // ... error handling
   }
