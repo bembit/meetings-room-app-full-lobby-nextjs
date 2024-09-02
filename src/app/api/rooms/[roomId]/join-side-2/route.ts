@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
@@ -12,11 +12,14 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return new Response("Unauthorized", { status: 401 });
     }
 
-    await connectDB();
+    await dbConnect();
 
     const room = await Room.findByIdAndUpdate(
       params.roomId,
-      { $pull: { participants: session.user._id, side1: session.user._id, side2: session.user._id } }, // Remove user from participants
+      {
+        $addToSet: { side2: session.user._id }, 
+        $pull: { participants: session.user._id, side1: session.user._id, } // Remove from lobby
+      },
       { new: true }
     );
 
@@ -24,12 +27,8 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Left room successfully" });
+    return NextResponse.json({ message: "Joined side 2 successfully" });
   } catch (error) {
-    console.error("Error leaving room:", error);
-    return NextResponse.json(
-      { error: "An error occurred while leaving the room" },
-      { status: 500 }
-    );
+    // ... error handling
   }
 }

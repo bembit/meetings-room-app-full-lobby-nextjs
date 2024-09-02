@@ -131,6 +131,45 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
+  const handleJoinSide1 = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/join-side-1`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        await fetchRoomData(); 
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
+  const handleJoinSide2 = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/join-side-2`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        await fetchRoomData(); 
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
+  };
+
+  const isOnSide1 = roomData?.side1.some(
+    (participant) => participant._id.toString() === session?.user?._id
+  );
+  const isOnSide2 = roomData?.side2.some(
+    (participant) => participant._id.toString() === session?.user?._id
+  );
+
   if (status === "loading" || isLoading) {
     return <div>Loading...</div>;
   } else if (status === "unauthenticated") {
@@ -152,13 +191,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         {session?.user?._id === roomData?.creatorId?._id && (
           <Button onClick={handleDeleteRoom}>Delete Room</Button>
         )}
-        <p>
+        <div className="flex flex-col space-y-2 p-4 underline">
           Owner:{" "}
           {roomData?.creatorId?.email || "Unknown"}
-        </p>
+        </div>
 
-        <h2>Participants:</h2>
-        <ul>
+        <h2>Participants to choose side:</h2>
+        <ul className="flex flex-col space-y-2 p-4">
           {roomData?.participants.map((participant) => (
             <li key={participant._id.toString()}>
               {participant.email}
@@ -172,6 +211,33 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           ))}
         </ul>
 
+        {/* sides test */}
+          <h2>Side 1:</h2>
+          <ul className="flex flex-col space-y-2 p-4">
+            {roomData?.side1.map((participant) => (
+              <li key={participant._id.toString()}>{participant.email}</li>
+            ))}
+          </ul>
+
+          <h2>Side 2:</h2>
+          <ul className="flex flex-col space-y-2 p-4">
+            {roomData?.side2.map((participant) => (
+              <li key={participant._id.toString()}>{participant.email}</li>
+            ))}
+          </ul>
+
+          {/* Conditionally render Join Side buttons if the user is in the lobby */}
+          {isParticipant && (
+            <>
+              <Button onClick={handleJoinSide1}>Join Side 1</Button>
+              <Button onClick={handleJoinSide2}>Join Side 2</Button>
+            </>
+          )}
+
+          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
+          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> }
+
+
         {!isParticipant && (
           <Button onClick={handleJoinRoom}>Join Room</Button>
         )}
@@ -179,7 +245,25 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         {isParticipant && (
           <Button onClick={handleLeaveRoom}>Leave Room</Button>
         )}
-        {/* isCreator should be able to delete the room */}
+
+          {/* {isParticipant && (
+            <>
+              <Button onClick={handleJoinSide1}>Join Side 1</Button>
+              <Button onClick={handleJoinSide2}>Join Side 2</Button>
+            </>
+          )}
+
+          {!isParticipant || !isOnSide1 || !isOnSide2 && (
+            <Button onClick={handleJoinRoom}>Join Room</Button>
+          )}
+
+          {isParticipant || isOnSide1 || isOnSide2 && (
+            <Button onClick={handleLeaveRoom}>Leave Room</Button>
+          )}
+
+          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
+          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> } */}
+          
       </div>
     </main>
   );

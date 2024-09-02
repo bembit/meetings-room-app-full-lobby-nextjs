@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
@@ -12,13 +12,17 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return new Response("Unauthorized", { status: 401 });
     }
 
-    await connectDB();
+    await dbConnect();
 
     // Find the room and update the participants array
     const room = await Room.findByIdAndUpdate(
       params.roomId,
-      { $addToSet: { participants: session.user._id } }, // Add user to participants if not already present
-      { new: true } // Return the updated room document
+      {
+        $addToSet: { participants: session.user._id }, // Add user to participants
+        // need to validate if the user is already in a side
+        $pull: { side1: session.user._id, side2: session.user._id } // Remove from both sides
+      },
+      { new: true } 
     );
 
     if (!room) {
