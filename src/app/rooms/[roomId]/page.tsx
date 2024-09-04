@@ -216,6 +216,16 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
+  const handleStartRoom = async () => {
+    alert("Starting the room...");
+  };
+
+  // will do for now : check if everyone in the room is ready
+  const isEveryoneReady = 
+    roomData?.participants.every(participant => participantReadyStates[participant._id.toString()]) &&
+    roomData?.side1.every(participant => participantReadyStates[participant._id.toString()]) &&
+    roomData?.side2.every(participant => participantReadyStates[participant._id.toString()]);
+
   const isOnSide1 = roomData?.side1.some(
     (participant) => participant._id.toString() === session?.user?._id
   );
@@ -233,6 +243,8 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
+  const isCreator = roomData?.creatorId?._id.toString() === session?.user?._id.toString();
 
   return (
     <main className="flex min-h-screen flex-col items-center">
@@ -358,6 +370,26 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
         {isParticipant && isOnSide1 && isOnSide2 && (
           <Button onClick={handleLeaveRoom}>Leave Room</Button>
+        )}
+
+        <br />
+        <br />
+        <br />
+
+        {/* Display "Waiting for players to ready" or "Everyone is ready" message */}
+        {/* {!isCreator && ( */}
+        <p>
+            {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
+          </p>
+        {/* )} */}
+
+        {/* Conditionally render the Start Room button only for the creator */}
+        {isCreator && ( 
+          isEveryoneReady ? (
+            <Button onClick={handleStartRoom}>Start Room</Button>
+          ) : (
+            <Button disabled>Start Room</Button> 
+          )
         )}
 
       </div>
