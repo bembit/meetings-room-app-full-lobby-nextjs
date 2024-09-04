@@ -8,6 +8,13 @@ const roomSchema = new mongoose.Schema({
   side2: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] }, // Initialize as empty array
   // side1: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   // side2: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  // where to put ready state and how
+  // isReady: { type: Boolean, default: false },
+  // array of readyPlayers?
+  readyParticipants: [{ 
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+    isReady: { type: Boolean, default: false } 
+  }],
 });
 
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);

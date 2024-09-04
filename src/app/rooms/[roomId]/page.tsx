@@ -15,6 +15,8 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
+
   const fetchRoomData = async () => {
     try {
       if (!session) { // Check if session is available
@@ -32,6 +34,14 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
           )
         );
+
+        // Initialize participantReadyStates based on readyParticipants from the server
+        const initialReadyStates: Record<string, boolean> = {};
+        data.readyParticipants.forEach((participant) => {
+          initialReadyStates[participant.userId.toString()] = participant.isReady;
+        });
+        setParticipantReadyStates(initialReadyStates);
+
       } else {
         setError("Failed to fetch room data.");
       }
@@ -43,10 +53,53 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
 
+  const checkReadiness = async () => {
+    try {
+      if (!session) {
+        return; // Or handle the case where the session is not available
+      }
+
+      const response = await fetch(`/api/rooms/${params.roomId}/is-ready`);
+      if (response.ok) {
+        const data = await response.json();
+        setIsReady(data.isReady);
+      } else {
+        // Handle error fetching readiness status
+      }
+    } catch (err) {
+      // Handle error
+    }
+  };
+
+  const handleReadyStateChange = async (userId: string, isReady: boolean) => {
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/ready`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isReady }),
+      });
+
+      if (response.ok) {
+        // setIsReady(isReady);
+        setParticipantReadyStates((prevStates) => ({
+          ...prevStates,
+          [userId]: isReady,
+        }));
+      } else {
+        // Handle error updating readiness status
+      }
+    } catch (err) {
+      // Handle error
+    }
+  };
+
   useEffect(() => {
     // Only fetch room data if the user is authenticated
     if (status === "authenticated") {
       fetchRoomData();
+      checkReadiness();
 
       const intervalId = setInterval(fetchRoomData, 5000); // Polling interval
 
@@ -138,7 +191,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       });
 
       if (response.ok) {
-        await fetchRoomData(); 
+        await fetchRoomData();
       } else {
         // ... error handling
       }
@@ -201,6 +254,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           {roomData?.participants.map((participant) => (
             <li key={participant._id.toString()}>
               {participant.email}
+              &nbsp; Waiting to choose sides.
               {/* Conditionally render the Kick button */}
               {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
                 <Button onClick={() => handleKickUser(participant._id.toString())}>
@@ -215,55 +269,97 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           <h2>Side 1:</h2>
           <ul className="flex flex-col space-y-2 p-4">
             {roomData?.side1.map((participant) => (
-              <li key={participant._id.toString()}>{participant.email}</li>
+              <li key={participant._id.toString()}>
+                <>
+                  {participant.email}
+                  {/* Conditionally render the Kick button */}
+                  {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
+                    <Button onClick={() => handleKickUser(participant._id.toString())}>
+                      Kick
+                    </Button>
+                  )}
+                  <span className="ml-2"> 
+                    {/* Display readiness status for all participants */}
+                    {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
+                  </span>
+                  {/* Conditionally render the checkbox only for the current user */}
+                  {participant._id.toString() === session?.user?._id && ( 
+                    <label className="ml-2"> 
+                      <input
+                        type="checkbox"
+                        checked={participantReadyStates[participant._id.toString()] || false}
+                        onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                      />
+                    </label>
+                  )}
+                </>
+              </li>
             ))}
           </ul>
 
           <h2>Side 2:</h2>
           <ul className="flex flex-col space-y-2 p-4">
             {roomData?.side2.map((participant) => (
-              <li key={participant._id.toString()}>{participant.email}</li>
+              <li key={participant._id.toString()}>
+                <>
+                  {participant.email}
+                  {/* Conditionally render the Kick button */}
+                  {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
+                    <Button onClick={() => handleKickUser(participant._id.toString())}>
+                      Kick
+                    </Button>
+                  )}
+                  <span className="ml-2">
+                    {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
+                  </span>
+                  {participant._id.toString() === session?.user?._id && (
+                    <label className="ml-2">
+                      <input
+                        type="checkbox"
+                        checked={participantReadyStates[participant._id.toString()] || false}
+                        onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                      />
+                    </label>
+                  )}
+                </>
+              </li>
             ))}
           </ul>
 
-          {/* Conditionally render Join Side buttons if the user is in the lobby */}
-          {isParticipant && (
+          {/* Conditionally render Join Side buttons or Switch Side button only if the current user is NOT ready */}
+          {!participantReadyStates[session?.user?._id] && ( 
             <>
-              <Button onClick={handleJoinSide1}>Join Side 1</Button>
-              <Button onClick={handleJoinSide2}>Join Side 2</Button>
+              {isParticipant && !isOnSide1 && !isOnSide2 && (
+                <>
+                  <Button onClick={handleJoinSide1}>Join Side 1</Button>
+                  <Button onClick={handleJoinSide2}>Join Side 2</Button>
+                </>
+              )}
+
+              {isOnSide1 && (
+                <Button onClick={handleJoinSide2}>Switch to Side 2</Button>
+              )}
+
+              {isOnSide2 && (
+                <Button onClick={handleJoinSide1}>Switch to Side 1</Button>
+              )}
             </>
           )}
 
-          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
-          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> }
-
-
-        {!isParticipant && (
+        {!isParticipant && !isOnSide1 && !isOnSide2 && (
           <Button onClick={handleJoinRoom}>Join Room</Button>
         )}
 
-        {isParticipant && (
+        {!isParticipant && (
+          <Button onClick={handleJoinRoom}>Back to waiting room</Button>
+        )}
+
+        {/* if all participants ready and have sides and all valid, host can start meeting room */}
+
+        {isParticipant && isOnSide1 && isOnSide2 && (
           <Button onClick={handleLeaveRoom}>Leave Room</Button>
         )}
 
-          {/* {isParticipant && (
-            <>
-              <Button onClick={handleJoinSide1}>Join Side 1</Button>
-              <Button onClick={handleJoinSide2}>Join Side 2</Button>
-            </>
-          )}
-
-          {!isParticipant || !isOnSide1 || !isOnSide2 && (
-            <Button onClick={handleJoinRoom}>Join Room</Button>
-          )}
-
-          {isParticipant || isOnSide1 || isOnSide2 && (
-            <Button onClick={handleLeaveRoom}>Leave Room</Button>
-          )}
-
-          {isOnSide1 && <Button onClick={handleJoinSide2}>Join Side 2</Button> }
-          {isOnSide2 && <Button onClick={handleJoinSide1}>Join Side 1</Button> } */}
-          
       </div>
     </main>
   );
