@@ -270,32 +270,34 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const isCreator = roomData?.creatorId?._id.toString() === session?.user?._id.toString();
 
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen flex-col items-center bg-dark-100 py-8">
       <Nav />
-      <div>
-        <h1 className="text-3xl font-bold mb-4">
+      <div className="w-full max-w-4xl bg-black shadow-md rounded-lg p-6">
+        <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
           Room name: {roomData?.name}
         </h1>
+
         {session?.user?._id === roomData?.creatorId?._id && (
-          <Button onClick={handleDeleteRoom}>Delete Room</Button>
+          <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleDeleteRoom}>
+            Delete Room
+          </Button>
         )}
-        <div className="flex flex-col space-y-2 p-4 underline">
-          Owner:{" "}
-          {roomData?.creatorId?.email || "Unknown"}
+
+        <div className="mb-6 p-4 bg-gray-900 rounded-lg">
+          <span className="font-semibold">Owner:</span> {roomData?.creatorId?.email || "Unknown"}
         </div>
 
-        <Button onClick={handleGenerateInviteLink}>Copy Invite Link</Button>
+        <Button className="mb-6 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
+          Copy Invite Link
+        </Button>
 
-
-        <h2>Participants to choose side:</h2>
-        <ul className="flex flex-col space-y-2 p-4">
+        <h2 className="text-xl font-semibold mb-4">Participants to choose side:</h2>
+        <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.participants.map((participant) => (
-            <li key={participant._id.toString()}>
-              {participant.email}
-              &nbsp; Waiting to choose sides.
-              {/* Conditionally render the Kick button */}
-              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
-                <Button onClick={() => handleKickUser(participant._id.toString())}>
+            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+              <span>{participant.email} &nbsp; Waiting to choose sides.</span>
+              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
+                <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
                   Kick
                 </Button>
               )}
@@ -303,123 +305,128 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           ))}
         </ul>
 
-        {/* sides test */}
-          <h2>Side 1:</h2>
-          <ul className="flex flex-col space-y-2 p-4">
-            {roomData?.side1.map((participant) => (
-              <li key={participant._id.toString()}>
-                <>
-                  {participant.email}
-                  {/* Conditionally render the Kick button */}
-                  {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
-                    <Button onClick={() => handleKickUser(participant._id.toString())}>
-                      Kick
-                    </Button>
-                  )}
-                  <span className="ml-2"> 
-                    {/* Display readiness status for all participants */}
-                    {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
-                  </span>
-                  {/* Conditionally render the checkbox only for the current user */}
-                  {participant._id.toString() === session?.user?._id && ( 
-                    <label className="ml-2"> 
-                      <input
-                        type="checkbox"
-                        checked={participantReadyStates[participant._id.toString()] || false}
-                        onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
-                      />
-                    </label>
-                  )}
-                </>
-              </li>
-            ))}
-          </ul>
-
-          <h2>Side 2:</h2>
-          <ul className="flex flex-col space-y-2 p-4">
-            {roomData?.side2.map((participant) => (
-              <li key={participant._id.toString()}>
-                <>
-                  {participant.email}
-                  {/* Conditionally render the Kick button */}
-                  {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && ( // Exclude the creator from being kicked
-                    <Button onClick={() => handleKickUser(participant._id.toString())}>
-                      Kick
-                    </Button>
-                  )}
-                  <span className="ml-2">
-                    {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
-                  </span>
-                  {participant._id.toString() === session?.user?._id && (
-                    <label className="ml-2">
-                      <input
-                        type="checkbox"
-                        checked={participantReadyStates[participant._id.toString()] || false}
-                        onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
-                      />
-                    </label>
-                  )}
-                </>
-              </li>
-            ))}
-          </ul>
-
-          {/* Conditionally render Join Side buttons or Switch Side button only if the current user is NOT ready */}
-          {!participantReadyStates[session?.user?._id] && ( 
-            <>
-              {isParticipant && !isOnSide1 && !isOnSide2 && (
-                <>
-                  <Button onClick={handleJoinSide1}>Join Side 1</Button>
-                  <Button onClick={handleJoinSide2}>Join Side 2</Button>
-                </>
+        <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
+        <ul className="mb-6 flex flex-col space-y-2">
+          {roomData?.side1.map((participant) => (
+            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+              <span>{participant.email}</span>
+              <span className="ml-4">
+                {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
+              </span>
+              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
+                <Button className="ml-4 bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
+                  Kick
+                </Button>
               )}
-
-              {isOnSide1 && (
-                <Button onClick={handleJoinSide2}>Switch to Side 2</Button>
+              {participant._id.toString() === session?.user?._id && (
+                <label className="ml-4">
+                  <input
+                    type="checkbox"
+                    checked={participantReadyStates[participant._id.toString()] || false}
+                    onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                    className="form-checkbox"
+                  />
+                </label>
               )}
+            </li>
+          ))}
+        </ul>
 
-              {isOnSide2 && (
-                <Button onClick={handleJoinSide1}>Switch to Side 1</Button>
+        <h2 className="text-xl font-semibold mb-4">Side 2:</h2>
+        <ul className="mb-6 flex flex-col space-y-2">
+          {roomData?.side2.map((participant) => (
+            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+              <span>{participant.email}</span>
+              <span className="ml-4">
+                {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
+              </span>
+              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
+                <Button className="ml-4 bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
+                  Kick
+                </Button>
               )}
-            </>
-          )}
+              {participant._id.toString() === session?.user?._id && (
+                <label className="ml-4">
+                  <input
+                    type="checkbox"
+                    checked={participantReadyStates[participant._id.toString()] || false}
+                    onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                    className="form-checkbox"
+                  />
+                </label>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {!participantReadyStates[session?.user?._id] && (
+          <>
+            {isParticipant && !isOnSide1 && !isOnSide2 && (
+              <div className="flex space-x-4">
+                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide1}>
+                  Join Side 1
+                </Button>
+                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide2}>
+                  Join Side 2
+                </Button>
+              </div>
+            )}
+
+            {isOnSide1 && (
+              <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide2}>
+                Switch to Side 2
+              </Button>
+            )}
+
+            {isOnSide2 && (
+              <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide1}>
+                Switch to Side 1
+              </Button>
+            )}
+          </>
+        )}
 
         {!isParticipant && !isOnSide1 && !isOnSide2 && (
-          <Button onClick={handleJoinRoom}>Join Room</Button>
+          <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
+            Join Room
+          </Button>
         )}
 
         {!isParticipant && (
-          <Button onClick={handleJoinRoom}>Back to waiting room</Button>
+          <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={handleJoinRoom}>
+            Back to waiting room
+          </Button>
         )}
-
-        {/* if all participants ready and have sides and all valid, host can start meeting room */}
 
         {isParticipant && isOnSide1 && isOnSide2 && (
-          <Button onClick={handleLeaveRoom}>Leave Room</Button>
+          <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLeaveRoom}>
+            Leave Room
+          </Button>
         )}
 
         <br />
         <br />
         <br />
 
-        {/* Display "Waiting for players to ready" or "Everyone is ready" message */}
-        {/* {!isCreator && ( */}
-        <p>
-            {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
-          </p>
-        {/* )} */}
+        <p className="text-center font-semibold">
+          {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
+        </p>
 
-        {/* Conditionally render the Start Room button only for the creator */}
-        {isCreator && ( 
-          isEveryoneReady ? (
-            <Button onClick={handleStartRoom}>Start Room</Button>
-          ) : (
-            <Button disabled>Start Room</Button> 
-          )
+        {isCreator && (
+          <div className="text-center mt-6">
+            {isEveryoneReady ? (
+              <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleStartRoom}>
+                Start Room
+              </Button>
+            ) : (
+              <Button className="bg-gray-500 text-white" disabled>
+                Start Room
+              </Button>
+            )}
+          </div>
         )}
 
         <Toaster />
-
       </div>
     </main>
   );
