@@ -24,6 +24,12 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
   const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
 
+  // wonky refresh session drop
+  // if (!session) { // Check if session is available
+  //   router.push("/");
+  //   return;
+  // }
+
   const handleGenerateInviteLink = () => {
     const inviteLink = `${window.location.origin}/api/invite/${roomData.inviteCode}`;
     navigator.clipboard.writeText(inviteLink) 
@@ -268,33 +274,32 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   }
 
   const isCreator = roomData?.creatorId?._id.toString() === session?.user?._id.toString();
-
   return (
-    <main className="flex min-h-screen flex-col items-center bg-dark-100 py-8">
+    <main className="flex min-h-screen flex-col items-center bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
       <Nav />
-      <div className="w-full max-w-4xl bg-black shadow-md rounded-lg p-6">
-        <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
+      <div className="w-full max-w-4xl shadow-md rounded-lg p-6 bg-slate-50 dark:bg-slate-800">
+        <h1 className="text-4xl font-bold text-center mb-6 text-slate-800 dark:text-slate-200">
           Room name: {roomData?.name}
         </h1>
-
-        {session?.user?._id === roomData?.creatorId?._id && (
+  
+        {(session?.user?._id === roomData?.creatorId?._id) && !isEveryoneReady && (
           <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleDeleteRoom}>
             Delete Room
           </Button>
         )}
-
-        <div className="mb-6 p-4 bg-gray-900 rounded-lg">
+  
+        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700">
           <span className="font-semibold">Owner:</span> {roomData?.creatorId?.email || "Unknown"}
         </div>
-
+  
         <Button className="mb-6 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
           Copy Invite Link
         </Button>
-
+  
         <h2 className="text-xl font-semibold mb-4">Participants to choose side:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.participants.map((participant) => (
-            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+            <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
               <span>{participant.email} &nbsp; Waiting to choose sides.</span>
               {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
                 <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
@@ -304,11 +309,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             </li>
           ))}
         </ul>
-
+  
         <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.side1.map((participant) => (
-            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+            <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
               <span>{participant.email}</span>
               <span className="ml-4">
                 {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
@@ -319,23 +324,39 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
                 </Button>
               )}
               {participant._id.toString() === session?.user?._id && (
-                <label className="ml-4">
-                  <input
-                    type="checkbox"
-                    checked={participantReadyStates[participant._id.toString()] || false}
-                    onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
-                    className="form-checkbox"
-                  />
+                <label className="relative inline-block">
+                <input
+                  type="checkbox"
+                  checked={participantReadyStates[participant._id.toString()] || false}
+                  onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                  className="appearance-none h-6 w-6 border border-gray-300 rounded-md cursor-pointer bg-red-500 border-red-500 checked:bg-green-500 checked:border-green-500 focus:outline-none"
+                />
+                {/* Green checkmark for the ready state */}
+                <span
+                  className={`absolute left-1 top-1 text-white text-xs ${
+                    participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
+                  }`}
+                >
+                  ✓
+                </span>
+                {/* Red X for the not ready state */}
+                <span
+                  className={`absolute left-1 top-1 text-white text-xs ${
+                    !participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
+                  }`}
+                >
+                  ✕
+                </span>
                 </label>
               )}
             </li>
           ))}
         </ul>
-
+  
         <h2 className="text-xl font-semibold mb-4">Side 2:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.side2.map((participant) => (
-            <li className="flex justify-between items-center bg-gray-900 p-4 rounded-lg" key={participant._id.toString()}>
+            <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
               <span>{participant.email}</span>
               <span className="ml-4">
                 {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
@@ -346,38 +367,55 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
                 </Button>
               )}
               {participant._id.toString() === session?.user?._id && (
-                <label className="ml-4">
-                  <input
-                    type="checkbox"
-                    checked={participantReadyStates[participant._id.toString()] || false}
-                    onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
-                    className="form-checkbox"
-                  />
+                <label className="relative inline-block">
+                <input
+                  type="checkbox"
+                  checked={participantReadyStates[participant._id.toString()] || false}
+                  onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                  className="appearance-none h-6 w-6 border border-gray-300 rounded-md cursor-pointer bg-red-500 border-red-500 checked:bg-green-500 checked:border-green-500 focus:outline-none"
+                />
+                {/* Green checkmark for the ready state */}
+                <span
+                  className={`absolute left-1 top-1 text-white text-xs ${
+                    participantReadyStates[participant._id.toString()] ? 'flex' : 'hidden'
+                  }`}
+                >
+                  ✓
+                </span>
+                {/* Red X for the not ready state */}
+                <span
+                  className={`absolute left-1 top-1 text-white text-xs ${
+                    !participantReadyStates[participant._id.toString()] ? 'flex' : 'hidden'
+                  }`}
+                >
+                  ✕
+                </span>
                 </label>
               )}
             </li>
           ))}
         </ul>
-
+  
+        <div className="flex space-x-4">
         {!participantReadyStates[session?.user?._id] && (
           <>
             {isParticipant && !isOnSide1 && !isOnSide2 && (
-              <div className="flex space-x-4">
+              <>
                 <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide1}>
                   Join Side 1
                 </Button>
                 <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide2}>
                   Join Side 2
                 </Button>
-              </div>
+              </>
             )}
-
+  
             {isOnSide1 && (
               <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide2}>
                 Switch to Side 2
               </Button>
             )}
-
+  
             {isOnSide2 && (
               <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide1}>
                 Switch to Side 1
@@ -385,32 +423,31 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             )}
           </>
         )}
-
+  
         {!isParticipant && !isOnSide1 && !isOnSide2 && (
           <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
             Join Room
           </Button>
         )}
-
-        {!isParticipant && (
+  
+        {!isParticipant && !isEveryoneReady && (
           <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={handleJoinRoom}>
             Back to waiting room
           </Button>
         )}
-
-        {isParticipant && isOnSide1 && isOnSide2 && (
+  
+        {(isParticipant || isOnSide1 || isOnSide2) && !isEveryoneReady && (
           <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLeaveRoom}>
             Leave Room
           </Button>
         )}
+  
+        </div>
 
-        <br />
-        <br />
-        <br />
-
-        <p className="text-center font-semibold">
+        <p className="text-center font-semibold mt-6">
           {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
         </p>
+        
 
         {isCreator && (
           <div className="text-center mt-6">
@@ -425,9 +462,10 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             )}
           </div>
         )}
-
+  
         <Toaster />
       </div>
     </main>
   );
+  
 }

@@ -189,7 +189,11 @@ export function NavigationMenuDemo() {
               </Link>
             </NavigationMenuItem>
 
-            <p className="text-xs text-muted-foreground">logged in as {session.user.email}</p>
+            <NavigationMenuItem>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <div className="text-xs text-muted-foreground">logged in as {session.user.email}</div>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
             
             </>
         )}      
