@@ -27,6 +27,9 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     // Remove the specified user from the participants array
     room.participants.pull(params.userId);
+    room.side1.pull(params.userId);
+    room.side2.pull(params.userId);
+    room.readyParticipants.filter((participant) => participant.userId.toString() !== params.userId);
     await room.save();
 
     return NextResponse.json({ message: "User kicked successfully" });

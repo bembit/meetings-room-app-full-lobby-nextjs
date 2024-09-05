@@ -16,7 +16,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     const room = await Room.findByIdAndUpdate(
       params.roomId,
-      { $pull: { participants: session.user._id, side1: session.user._id, side2: session.user._id } }, // Remove user from participants
+      { $pull: { participants: session.user._id, side1: session.user._id, side2: session.user._id, readyParticipants: { userId: session.user._id } } },
       { new: true }
     );
 
