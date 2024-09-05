@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import DropdownMenuDemo from "@/components/DropdownMenuDemo";
+// import DropdownMenuDemo from "@/components/DropdownMenuDemo";
 import Nav from "@/components/Nav";
 import Loading from "@/components/Loading";
 
@@ -39,7 +39,7 @@ export default function Profile() {
     <main className="flex min-h-screen flex-col items-center">
       <Nav />
       <div>
-        <DropdownMenuDemo email={email} />
+        {/* <DropdownMenuDemo email={email} /> */}
         <h2 className="text-3xl font-bold mb-4">
           Welcome, {email}!
         </h2>

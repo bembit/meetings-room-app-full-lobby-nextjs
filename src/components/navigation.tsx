@@ -54,6 +54,13 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ]
 
+// interface NavigationMenuDemoProps {
+//   // session: any;
+//   email: string;
+//   name?: string;
+// }
+// { email, name }: NavigationMenuDemoProps
+
 export function NavigationMenuDemo() {
 
   const { data: session } = useSession(); // Retrieve session data
@@ -61,7 +68,7 @@ export function NavigationMenuDemo() {
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger><Link href="/" legacyBehavior passHref>Home</Link></NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -110,7 +117,7 @@ export function NavigationMenuDemo() {
               ))}
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
 
         {/* <NavigationMenuItem>DEBUG</NavigationMenuItem>
 
@@ -141,6 +148,14 @@ export function NavigationMenuDemo() {
         <NavigationMenuItem>DEBUG</NavigationMenuItem> */}
 
         <NavigationMenuItem>
+          <Link href="/" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Login
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>  
+
+        <NavigationMenuItem>
           <Link href="/create-room" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Create
@@ -165,14 +180,17 @@ export function NavigationMenuDemo() {
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
-            
-            {/* <NavigationMenuItem>
-              <Link href="/dashboard" legacyBehavior passHref>
+
+            <NavigationMenuItem>
+              <Link href="/users" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Dashboard
+                  Users
                 </NavigationMenuLink>
               </Link>
-            </NavigationMenuItem> */}
+            </NavigationMenuItem>
+
+            <p className="text-xs text-muted-foreground">logged in as {session.user.email}</p>
+            
             </>
         )}      
       </NavigationMenuList>

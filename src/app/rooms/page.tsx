@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import HoverCardDemo from '@/components/HoverCardDemo';
+import Loading from '@/components/Loading';
 
 import Nav from "@/components/Nav";
 
@@ -10,6 +13,13 @@ export default function RoomsPage() {
   const [rooms, setRooms] = useState<any[]>([]); // Adjust the type as needed based on your Room model
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  if (!session) { // Check if session is available
+    router.push("/");
+    return;
+  }
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -33,7 +43,7 @@ export default function RoomsPage() {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Loading from "@/components/Loading";
 
 import { Button } from "@/components/ui/button";
 import Nav from "@/components/Nav";
@@ -234,7 +235,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   );
 
   if (status === "loading" || isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   } else if (status === "unauthenticated") {
     router.push("/");
     return null;
