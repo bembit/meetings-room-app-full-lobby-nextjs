@@ -7,6 +7,10 @@ import Loading from "@/components/Loading";
 
 import { Button } from "@/components/ui/button";
 import Nav from "@/components/Nav";
+import { Toaster } from "@/components/ui/toaster";
+// import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
+
 
 export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
@@ -16,7 +20,25 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { toast } = useToast();
+
   const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
+
+  const handleGenerateInviteLink = () => {
+    const inviteLink = `${window.location.origin}/api/invite/${roomData.inviteCode}`;
+    navigator.clipboard.writeText(inviteLink) 
+      .then(() => {
+        console.log('Invite link copied to clipboard!');
+        toast({
+          variant: "destructive",
+          title: 'Invite link copied to clipboard!',
+          description: 'This is your invite link. Share it with your friends!',
+        })
+      })
+      .catch((err) => {
+        console.error('Failed to copy invite link:', err);
+      });
+  };
 
   const fetchRoomData = async () => {
     try {
@@ -262,6 +284,9 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           {roomData?.creatorId?.email || "Unknown"}
         </div>
 
+        <Button onClick={handleGenerateInviteLink}>Copy Invite Link</Button>
+
+
         <h2>Participants to choose side:</h2>
         <ul className="flex flex-col space-y-2 p-4">
           {roomData?.participants.map((participant) => (
@@ -392,6 +417,8 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             <Button disabled>Start Room</Button> 
           )
         )}
+
+        <Toaster />
 
       </div>
     </main>

@@ -15,6 +15,9 @@ const roomSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
     isReady: { type: Boolean, default: false } 
   }],
+  inviteCode: { type: String, unique: true },
+  // kicked users. timeout 30sec.
+  // banned users. banned until meeting ends
 });
 
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);
