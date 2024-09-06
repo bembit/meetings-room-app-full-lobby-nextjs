@@ -253,7 +253,20 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   };
 
   const handleStartRoom = async () => {
-    alert("Starting the room...");
+    try {
+      const response = await fetch(`/api/rooms/${params.roomId}/start`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        // Redirect all participants to the start page
+        router.push(`/rooms/${params.roomId}/start`);
+      } else {
+        // ... error handling
+      }
+    } catch (err) {
+      // ... error handling
+    }
   };
 
   // will do for now : check if everyone in the room is ready
