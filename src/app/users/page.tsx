@@ -3,7 +3,6 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
-import Nav from "@/components/Nav";
 import HoverCardDemo from "@/components/HoverCardDemo";
 import Link from "next/link";
 

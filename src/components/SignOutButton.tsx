@@ -8,8 +8,7 @@ export default function SignOutButton() {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut(); // Let NextAuth.js handle the default redirection
-    router.push('/'); 
+    await signOut({ callbackUrl: "/" });
   };
 
   return (

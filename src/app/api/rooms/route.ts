@@ -1,4 +1,4 @@
-// server-side route for creating a new room
+// route for creating a new room
 
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
@@ -29,7 +29,6 @@ export async function POST(request: Request)  
 
     const newRoom = new Room({
       name,
-      // revisit tomorrow
       creatorId: new mongoose.Types.ObjectId(creatorId),
       participants: participants.map(participantId => new mongoose.Types.ObjectId(participantId)),
       side1: [],

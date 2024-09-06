@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
 
 export async function GET(request: Request, { params }: { params: { inviteCode: string } }) {
   try {
-    await connectDB();
+    await dbConnect();
 
     const room = await Room.findOne({ inviteCode: params.inviteCode });
 
