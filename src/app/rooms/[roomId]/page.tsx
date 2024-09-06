@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "@/components/Loading";
 
@@ -24,19 +24,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
   const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
 
-  // wonky refresh session drop
-  // if (!session) { // Check if session is available
-  //   router.push("/");
-  //   return;
-  // }
-
   const handleGenerateInviteLink = () => {
     const inviteLink = `${window.location.origin}/api/invite/${roomData.inviteCode}`;
     navigator.clipboard.writeText(inviteLink) 
       .then(() => {
         console.log('Invite link copied to clipboard!');
         toast({
-          variant: "destructive",
+          // variant: "destructive",
           title: 'Invite link copied to clipboard!',
           description: 'This is your invite link. Share it with your friends!',
         })
@@ -127,6 +121,19 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     // Only fetch room data if the user is authenticated
     if (status === "authenticated") {
+
+      const isValidRoomId = /^[0-9a-fA-F]{24}$/.test(params.roomId);
+
+      if (!isValidRoomId) {
+        setError("Invalid room ID.");
+        // toast({
+        //   variant: "destructive",
+        //   title: 'That is not a valid room ID.',
+        //   description: 'Check the room ID and try again.',
+        // })
+        router.push("/rooms");
+      }
+
       fetchRoomData();
       checkReadiness();
 
