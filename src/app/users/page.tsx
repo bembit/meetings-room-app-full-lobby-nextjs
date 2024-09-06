@@ -20,9 +20,7 @@ export default async function UsersPage() {
   const users = await User.find({}, "email").limit(10); // Fetch the encoded ID and email
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-dark-100 light:bg-gray-900 text-gray-800 dark:text-gray-200">
-      <Nav />
-      <div className='w-full max-w-4xl shadow-md rounded-lg p-6 light:bg-gray-900 dark:bg-black'>
+    <div className='w-full max-w-4xl shadow-md rounded-lg p-6 light:bg-gray-900 dark:bg-black'>
       <h1 className="text-3xl font-bold mb-4">Registered Users</h1>
       <ul>
         {users.map((user) => (
@@ -36,7 +34,6 @@ export default async function UsersPage() {
           </li>
         ))}
       </ul>
-      </div>
-    </main>
+    </div>
   );
 }

@@ -275,8 +275,6 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
   const isCreator = roomData?.creatorId?._id.toString() === session?.user?._id.toString();
   return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
-      <Nav />
       <div className="w-full max-w-4xl shadow-md rounded-lg p-6 bg-slate-50 dark:bg-slate-800">
         <h1 className="text-4xl font-bold text-center mb-6 text-slate-800 dark:text-slate-200">
           Room name: {roomData?.name}
@@ -465,7 +463,5 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   
         <Toaster />
       </div>
-    </main>
   );
-  
 }
