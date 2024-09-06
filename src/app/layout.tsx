@@ -3,8 +3,9 @@ import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import "./globals.css";
 import Providers from "./providers";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/ThemeProvider"
 // import ThemeWrapper from "@/components/ThemeWrapper";
+import Nav from "@/components/Nav";
 
 
 const fontSans = FontSans({
@@ -38,7 +39,10 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <main className="flex min-h-screen flex-col items-center bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                <Nav />
+                {children}
+              </main>
           </ThemeProvider>
           {/* <ThemeWrapper>{children}</ThemeWrapper> */}
         </Providers> 

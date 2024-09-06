@@ -36,8 +36,6 @@ export default function Profile() {
   const { email } = session.user;
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-dark-100 light:bg-gray-900 text-gray-800 dark:text-gray-200">
-      <Nav />
       <div className='w-full max-w-4xl shadow-md rounded-lg p-6 light:bg-gray-900 dark:bg-black'>
         {/* <DropdownMenuDemo email={email} /> */}
         <h2 className="text-3xl font-bold mb-4">
@@ -52,6 +50,5 @@ export default function Profile() {
           </ul>
         </div>
       </div>
-    </main>
   );
 }

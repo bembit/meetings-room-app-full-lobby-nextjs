@@ -19,7 +19,6 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       params.roomId,
       {
         $addToSet: { participants: session.user._id }, // Add user to participants
-        // need to validate if the user is already in a side
         $pull: { side1: session.user._id, side2: session.user._id, readyParticipants: { userId: session.user._id } } // Remove from both sides
       },
       { new: true } 

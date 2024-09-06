@@ -1,5 +1,7 @@
+// leave the room
+
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
@@ -12,7 +14,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return new Response("Unauthorized", { status: 401 });
     }
 
-    await connectDB();
+    await dbConnect();
 
     const room = await Room.findByIdAndUpdate(
       params.roomId,

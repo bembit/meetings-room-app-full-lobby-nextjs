@@ -1,7 +1,7 @@
 "use client";
 
-import { NavigationMenuDemo } from "@/components/navigation";
-import { ModeToggle } from "@/components/ModeToggle";
+import { NavigationMenuDemo } from "@/components/Navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import SignOutButton from "./SignOutButton";
 import { useSession } from "next-auth/react"; // Import useSession hook
 // import { DropdownMenuDemo } from "@/components/DropdownMenuDemo";
@@ -18,7 +18,7 @@ export default function Nav() {
             {session && (
                 <SignOutButton />
             )}
-            <ModeToggle />
+            <ThemeToggle />
             </>
         </div>
     );

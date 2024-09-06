@@ -1,7 +1,7 @@
 // app/ThemeWrapper.tsx
 'use client'; // Mark this as a Client Component
 
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function ThemeWrapper({ children }: { children: React.ReactNode }) {
   return (

@@ -1,5 +1,7 @@
+// ready feature route
+
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
+import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../auth/[...nextauth]/route";
@@ -15,7 +17,7 @@ export async function POST(
       return new Response("Unauthorized", { status: 401 });
     }
 
-    await connectDB();
+    await dbConnect();
 
     const { isReady } = await request.json();
 
