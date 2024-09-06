@@ -25,8 +25,12 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return new Response("Forbidden - Only the room creator can start the room", { status: 403 });
     }
 
-    // everyone is ready
-    // update the room's status to "started" if needed
+    // Update the room's isStarted field to true
+    room.isStarted = true; 
+    await room.save();
+
+    // You might want to add additional checks here, such as
+    // - Whether everyone is ready
 
     return NextResponse.json({ message: "Room started successfully" });
   } catch (error) {

@@ -1,3 +1,4 @@
+import { create } from "domain";
 import mongoose from "mongoose";
 
 const roomSchema = new mongoose.Schema({
@@ -14,6 +15,9 @@ const roomSchema = new mongoose.Schema({
   inviteCode: { type: String, unique: true },
   // kicked users. timeout 30sec.
   // banned users. banned until meeting ends
+  createdAt: { type: Date, default: Date.now },
+  isStarted: { type: Boolean, default: false },
+
 });
 
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);

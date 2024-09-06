@@ -6,11 +6,8 @@ import { useEffect, useState } from "react";
 import Loading from "@/components/Loading";
 
 import { Button } from "@/components/ui/button";
-import Nav from "@/components/Nav";
 import { Toaster } from "@/components/ui/toaster";
-// import { Toast } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
-
 
 export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
@@ -23,6 +20,8 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { toast } = useToast();
 
   const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
+
+  const [elapsedTime, setElapsedTime] = useState(0); // State to track elapsed time in seconds
 
   const handleGenerateInviteLink = () => {
     const inviteLink = `${window.location.origin}/api/invite/${roomData.inviteCode}`;
