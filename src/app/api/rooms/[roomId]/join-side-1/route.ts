@@ -14,21 +14,34 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     await dbConnect();
 
-    const room = await Room.findByIdAndUpdate(
-      params.roomId,
-      {
-        $addToSet: { side1: session.user._id }, 
-        $pull: { participants: session.user._id, side2: session.user._id, } // Remove from lobby
-      },
-      { new: true }
-    );
+    // Find the room first to check if it has started
+    const room = await Room.findById(params.roomId);
 
     if (!room) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Joined side 1 successfully" });
+    // If the room is already started, block the action
+    if (room.isStarted) {
+      return NextResponse.json({ error: 'Room has already started, action not allowed' }, { status: 403 });
+    }
+
+    // Proceed with adding the user to side1 if the room has not started
+    const updatedRoom = await Room.findByIdAndUpdate(
+      params.roomId,
+      {
+        $addToSet: { side1: session.user._id }, // Add the user to side1
+        $pull: { participants: session.user._id, side2: session.user._id }, // Remove from other groups
+      },
+      { new: true }
+    );
+
+    return NextResponse.json({ message: "Joined side 1 successfully", room: updatedRoom });
   } catch (error) {
-    // ... error handling
+    console.error("Error joining side 1:", error);
+    return NextResponse.json(
+      { error: "An error occurred while trying to join side 1" },
+      { status: 500 }
+    );
   }
 }

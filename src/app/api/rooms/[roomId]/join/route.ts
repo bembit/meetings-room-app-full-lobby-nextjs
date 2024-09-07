@@ -14,8 +14,20 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     await dbConnect();
 
-    // Find the room and update the participants array
-    const room = await Room.findByIdAndUpdate(
+    // Find the room
+    const room = await Room.findById(params.roomId);
+
+    if (!room) {
+      return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    }
+
+    // Check if the room has started and block joining if it has
+    if (room.isStarted) {
+      return NextResponse.json({ error: "Room has started, cannot join" }, { status: 403 });
+    }
+
+    // Update the participants array and pull from side1 and side2
+    await Room.findByIdAndUpdate(
       params.roomId,
       {
         $addToSet: { participants: session.user._id }, // Add user to participants
@@ -23,10 +35,6 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       },
       { new: true } 
     );
-
-    if (!room) {
-      return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-    }
 
     return NextResponse.json({ message: "Joined room successfully" });
   } catch (error) {

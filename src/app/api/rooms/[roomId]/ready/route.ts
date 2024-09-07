@@ -1,5 +1,3 @@
-// ready feature route
-
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
@@ -25,6 +23,11 @@ export async function POST(
 
     if (!room) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
+
+    // Check if the room has started and block readiness updates if it has
+    if (room.isStarted) {
+      return NextResponse.json({ error: "Room has started, cannot update readiness" }, { status: 403 });
     }
 
     // Check if readyParticipants array exists and is not empty

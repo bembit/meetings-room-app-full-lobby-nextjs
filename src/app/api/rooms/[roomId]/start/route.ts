@@ -20,6 +20,11 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
+    // Check if the room has already started
+    if (room.isStarted) {
+      return NextResponse.json({ error: 'Room has already started' }, { status: 403 });
+    }
+
     // Check if the current user is the creator of the room
     if (room.creatorId.toString() !== session.user._id) {
       return new Response("Forbidden - Only the room creator can start the room", { status: 403 });

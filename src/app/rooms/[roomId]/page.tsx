@@ -8,6 +8,8 @@ import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+// import { Link } from "lucide-react";
+import Link from "next/link";
 
 export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
@@ -128,6 +130,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         }));
       } else {
         // Handle error updating readiness status
+        const data = await response.json();
+        console.error("Error updating readiness:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error updating readiness!',
+          description: data.error,
+        })
       }
     } catch (err) {
       // Handle error
@@ -196,6 +205,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         const data = await response.json();
         console.error("Error joining room:", data.error);
         // Handle the error (e.g., display an error message)
+        toast({
+          variant: "destructive",
+          title: 'Error joining room!',
+          description: data.error,
+        })
       }
     } catch (err) {
       console.error("Error joining room:", err);
@@ -216,7 +230,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       } else {
         const data = await response.json();
         console.error("Error leaving room:", data.error);
-        // Handle the error 
+        toast({
+          variant: "destructive",
+          title: 'Error leaving room!',
+          description: data.error,
+        })
       }
     } catch (err) {
       console.error("Error leaving room:", err);
@@ -235,6 +253,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         await fetchRoomData();
       } else {
         // ... error handling
+        const data = await response.json();
+        console.error("Error kicking user:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error kicking user!',
+          description: data.error,
+        })
       }
     } catch (err) {
       // ... error handling
@@ -251,6 +276,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         router.push('/rooms'); // Redirect to the rooms list after deletion
       } else {
         // ... error handling
+        const data = await response.json();
+        console.error("Error deleting room:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error deleting room!',
+          description: data.error,
+        })
       }
     } catch (err) {
       // ... error handling
@@ -267,6 +299,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         await fetchRoomData();
       } else {
         // ... error handling
+        const data = await response.json();
+        console.error("Error joining side 1:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error joining side 1!',
+          description: data.error,
+        })
       }
     } catch (err) {
       // ... error handling
@@ -283,6 +322,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         await fetchRoomData(); 
       } else {
         // ... error handling
+        const data = await response.json();
+        console.error("Error joining side 2:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error joining side 2!',
+          description: data.error,
+        })
       }
     } catch (err) {
       // ... error handling
@@ -300,6 +346,14 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         router.push(`/rooms/${params.roomId}/start`);
       } else {
         // ... error handling
+        const data = await response.json();
+        console.error("Error starting room:", data.error);
+        toast({
+          variant: "destructive",
+          title: 'Error starting room!',
+          description: data.error,
+          // add a link to room
+        })
       }
     } catch (err) {
       // ... error handling
@@ -509,14 +563,21 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   
         </div>
 
-        <p className="text-center font-semibold mt-6">
-          {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
-        </p>
-        
+        {!roomData?.isStarted && (
+          <p className="text-center font-semibold mt-6">
+            {isEveryoneReady ? "Everyone is ready, waiting for lobby leader!" : "Waiting for players to ready..."}
+          </p>
+        )}
+
+        {roomData?.isStarted && (
+          <p className="text-center font-semibold mt-6">
+            Meeting room already started, <Link className="text-blue-500 underline hover:text-blue-600" href={`/rooms/${params.roomId}/start`}>go back to room for more info</Link>
+          </p>
+        )}
 
         {isCreator && (
           <div className="text-center mt-6">
-            {isEveryoneReady ? (
+            {isEveryoneReady && !roomData?.isStarted ? (
               <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleStartRoom}>
                 Start Room
               </Button>
