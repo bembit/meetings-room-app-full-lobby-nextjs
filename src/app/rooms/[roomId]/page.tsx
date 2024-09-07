@@ -15,6 +15,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [roomData, setRoomData] = useState<any>(null);
+  // creator of room is not handled to be isParticipant
   const [isParticipant, setIsParticipant] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,7 +59,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         if (!roomData || JSON.stringify(roomData) !== JSON.stringify(data)) {
           setRoomData(data);
           
-          const TIMEOUT_DURATION = 1 * 60 * 1000;
+          const TIMEOUT_DURATION = 30 * 60 * 1000;
   
           if (data.createdAt && !data.isStarted) {
             const currentTime = new Date();
@@ -93,24 +94,24 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   };
   
+// revisit
+  // const checkReadiness = async () => {
+  //   try {
+  //     if (!session) {
+  //       return; // Or handle the case where the session is not available
+  //     }
 
-  const checkReadiness = async () => {
-    try {
-      if (!session) {
-        return; // Or handle the case where the session is not available
-      }
-
-      const response = await fetch(`/api/rooms/${params.roomId}/is-ready`);
-      if (response.ok) {
-        const data = await response.json();
-        setIsReady(data.isReady);
-      } else {
-        // Handle error fetching readiness status
-      }
-    } catch (err) {
-      // Handle error
-    }
-  };
+  //     const response = await fetch(`/api/rooms/${params.roomId}/is-ready`);
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setIsReady(data.isReady);
+  //     } else {
+  //       // Handle error fetching readiness status
+  //     }
+  //   } catch (err) {
+  //     // Handle error
+  //   }
+  // };
 
   const handleReadyStateChange = async (userId: string, isReady: boolean) => {
     try {
@@ -151,16 +152,12 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
       if (!isValidRoomId) {
         setError("Invalid room ID.");
-        // toast({
-        //   variant: "destructive",
-        //   title: 'That is not a valid room ID.',
-        //   description: 'Check the room ID and try again.',
-        // })
         router.push("/rooms");
       }
 
       fetchRoomData();
-      checkReadiness();
+
+      // checkReadiness();
 
       const intervalId = setInterval(fetchRoomData, 5000); // Polling interval
 

@@ -32,6 +32,7 @@ export async function POST(request: Request, { params }: { params: { roomId: str
       {
         $addToSet: { side2: session.user._id }, // Add the user to side2
         $pull: { participants: session.user._id, side1: session.user._id }, // Remove from other groups
+        // $pull: { side1: session.user._id },
       },
       { new: true }
     );

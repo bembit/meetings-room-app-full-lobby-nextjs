@@ -13,11 +13,14 @@ const roomSchema = new mongoose.Schema({
     isReady: { type: Boolean, default: false } 
   }],
   inviteCode: { type: String, unique: true },
-  // kicked users. timeout 30sec.
-  // banned users. banned until meeting ends
+
   createdAt: { type: Date, default: Date.now },
   isStarted: { type: Boolean, default: false },
 
+  // kicked users. timeout 30sec.
+  kickedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  // banned users. banned until meeting ends
+  bannedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);

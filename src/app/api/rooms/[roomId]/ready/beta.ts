@@ -25,11 +25,17 @@ export async function POST(
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    // DISABLED TO TEST OITHER ROUTES
     // Check if the room has started and block readiness updates if it has
-    // if (room.isStarted) {
-    //   return NextResponse.json({ error: "Room has started, cannot update readiness" }, { status: 403 });
-    // }
+    if (room.isStarted) {
+      return NextResponse.json({ error: "Room has started, cannot update readiness" }, { status: 403 });
+    }
+
+    const userId = session.user._id;
+
+    const isUserInSide = room.side1.includes(userId) || room.side2.includes(userId);
+    if (!isUserInSide) {
+      return NextResponse.json({ error: "User is not in a team, cannot update readiness" }, { status: 403 });
+    }
 
     // Check if readyParticipants array exists and is not empty
     if (room.readyParticipants && room.readyParticipants.length > 0) {
@@ -51,6 +57,25 @@ export async function POST(
     } else if (isReady) {
       // If the array is empty and isReady is true, add the user
       room.readyParticipants.push({ userId: session.user._id, isReady });
+    }
+
+    // Check if all users in side1 and side2 are ready
+    const allInSides = [...room.side1, ...room.side2];
+    const allParticipantsReady = allInSides.every((participant) =>
+      room.readyParticipants.some((p) => p.userId.toString() === participant.toString() && p.isReady)
+    );
+
+    if (allParticipantsReady) {
+
+      // to be implemented based on the meeting type
+      // if (room.meetingType === "video") {
+            // size of the room = 10;
+            // if (room.participants.length === 10) {
+            // bla bla can't ready/unready anymore
+      // }
+
+      console.log("all participants ready");
+      return NextResponse.json({ message: "All participants are ready" });
     }
 
     await room.save();

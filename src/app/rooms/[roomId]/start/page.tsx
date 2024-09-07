@@ -49,11 +49,13 @@ export default function RoomStartPage({ params }: { params: { roomId: string } }
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
+    <div className="w-full max-w-4xl shadow-md rounded-lg p-6 bg-slate-50 dark:bg-slate-800">
       <div>
         <h1 className="text-3xl font-bold mb-4">
           {roomData?.name} - started!
         </h1>
+
+        <p>Room ID: {roomData?._id}</p>
 
         <h2>Participants:</h2>
         <ul>
@@ -74,8 +76,11 @@ export default function RoomStartPage({ params }: { params: { roomId: string } }
           {roomData?.side2.map((participant) => (
             <li key={participant._id.toString()}>{participant.email}</li>
           ))}
+          {roomData?.side2.length === 0 && (
+            <p>Nobody on side 2</p>
+          )}
         </ul>
       </div>
-    </main>
+    </div>
   );
 }
