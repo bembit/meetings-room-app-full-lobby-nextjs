@@ -10,6 +10,9 @@ import { v4 as uuidv4 } from "uuid";
 
 interface RoomData {
   name: string;
+  region: string;
+  mode: string;
+  roomSize: number;
   creatorId: string;
   participants: string[];
 }
@@ -25,10 +28,13 @@ export async function POST(request: Request)  
 
     await dbConnect();
 
-    const { name, creatorId, participants } = await request.json() as RoomData;
+    const { name, region, mode, roomSize, creatorId, participants } = await request.json() as RoomData;
 
     const newRoom = new Room({
       name,
+      region,
+      mode,
+      roomSize,
       creatorId: new mongoose.Types.ObjectId(creatorId),
       participants: participants.map(participantId => new mongoose.Types.ObjectId(participantId)),
       side1: [],

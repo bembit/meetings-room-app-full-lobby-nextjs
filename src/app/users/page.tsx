@@ -21,6 +21,7 @@ export default async function UsersPage() {
   return (
     <div className='w-full max-w-4xl shadow-md rounded-lg p-6 light:bg-gray-900 dark:bg-black'>
       <h1 className="text-3xl font-bold mb-4">Registered Users</h1>
+      <h2>Server side component test</h2>
       <ul>
         {users.map((user) => (
           <li key={user._id} className="p-4 border border-gray-200 mb-2 rou">

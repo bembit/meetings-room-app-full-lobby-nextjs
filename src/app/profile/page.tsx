@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-// import DropdownMenuDemo from "@/components/DropdownMenuDemo";
-import Nav from "@/components/Nav";
 import Loading from "@/components/Loading";
 
 export default function Profile() {

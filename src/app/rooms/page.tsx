@@ -2,24 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import HoverCardDemo from '@/components/HoverCardDemo';
 import Loading from '@/components/Loading';
 
 export default function RoomsPage() {
-  // fix types
   const [rooms, setRooms] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
+  const { data: session, status } = useSession();
   
-  // const router = useRouter();
-  // const { data: session, status } = useSession();
-  // if (!session) { // Check if session is available
-  //   router.push("/");
-  //   return;
-  // }
-
   useEffect(() => {
     const fetchRooms = async () => {
       try {
@@ -42,8 +36,11 @@ export default function RoomsPage() {
     fetchRooms();
   }, []);
 
-  if (isLoading) {
+  if (status === "loading" || isLoading) {
     return <Loading />;
+  } else if (status === "unauthenticated") {
+    router.push("/");
+    return null;
   }
 
   if (error) {

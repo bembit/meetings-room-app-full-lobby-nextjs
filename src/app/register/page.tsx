@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import useDebounce from "@/hooks/useDebounce";
@@ -19,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import Nav from "@/components/Nav";
+import Loading from "@/components/Loading";
 
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long." })
@@ -50,6 +51,8 @@ export default function Register() {
   const [emailError, setEmailError] = useState(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const [ isLoading, setIsLoading ] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -117,6 +120,10 @@ export default function Register() {
       setError("An unexpected error occurred. Please try again later.");
     }
   };
+
+  if (status === "loading" || isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className='w-full max-w-4xl shadow-md rounded-lg p-6 light:bg-gray-900 dark:bg-black'>

@@ -8,8 +8,9 @@ import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-// import { Link } from "lucide-react";
 import Link from "next/link";
+
+import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 
 export default function RoomPage({ params }: { params: { roomId: string } }) {
   const { data: session, status } = useSession();
@@ -389,35 +390,117 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   const isCreator = roomData?.creatorId?._id.toString() === session?.user?._id.toString();
   return (
       <div className="w-full max-w-4xl shadow-md rounded-lg p-6 bg-slate-50 dark:bg-slate-800">
-        <h1 className="text-4xl font-bold text-center mb-6 text-slate-800 dark:text-slate-200">
+        <h1 className="text-3xl font-bold text-center mb-6 text-slate-800 dark:text-slate-200">
           Room name: {roomData?.name}
         </h1>
-  
-        {(session?.user?._id === roomData?.creatorId?._id) && !isEveryoneReady && (
-          <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleDeleteRoom}>
-            Delete Room
+
+        <div className="flex justify-center items-center">
+          {/* Display the countdown timer if the room is not started */}
+          {!roomData?.isStarted && timeRemaining !== null && (
+            <p>Time remaining: {formatElapsedTime(timeRemaining)}</p>
+          )}
+          {/* Display a message when the room has started */}
+          {roomData?.isStarted && (
+            <Link className="text-blue-500 underline hover:text-blue-600" href={`/rooms/${params.roomId}/start`}>Room started, timer stopped.</Link>
+          )}
+        </div>
+
+        {/* <div className="flex flex-row justify-between items-center"> */}
+        <div className="flex flex-row justify-between items-center mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700 mt-6">
+
+          <div className="flex flex-col">
+            <h2 className="text-xl font-semibold mb-2">Region:<span className="text-orange-700 hover:text-orange-700 ml-2">{roomData?.region}</span></h2>
+            <h2 className="text-xl font-semibold mb-2">Mode:<span className="text-orange-700 hover:text-orange-700 ml-2">{roomData?.mode}</span></h2>
+            <h2 className="text-xl font-semibold mb-2">Room Size:<span className="text-orange-700 hover:text-orange-700 ml-2">{roomData?.roomSize}</span></h2>
+          </div>
+    
+          {/* <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white">
+            Secret Button
+          </Button> */}
+
+          {!isParticipant && !isOnSide1 && !isOnSide2 && (
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
+              Join Room
+            </Button>
+          )}
+
+          {isParticipant && !isOnSide1 && !isOnSide2 && (
+          <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
+            Copy Invite Link
           </Button>
-        )}
+          )}
 
-        {/* Display the countdown timer if the room is not started */}
-        {!roomData?.isStarted && timeRemaining !== null && (
-          <p>Time remaining: {formatElapsedTime(timeRemaining)}</p>
-        )}
+          {(session?.user?._id === roomData?.creatorId?._id) && !isEveryoneReady && (
+            <ConfirmationDialog
+              title="Delete Room"
+              description="Are you sure you want to delete this room? This action cannot be undone."
+              onConfirm={handleDeleteRoom}
+              confirmText="Delete Room"
+              cancelText="Cancel"
+            />
+          )}
 
-        {/* Display a message when the room has started */}
-        {roomData?.isStarted && (
-          <p>Room started, timer stopped.</p>
-        )}
-  
-        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700">
-          <span className="font-semibold">Owner:</span> {roomData?.creatorId?.email || "Unknown"}
         </div>
   
-        <Button className="mb-6 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
-          Copy Invite Link
-        </Button>
+        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700 mt-6">
+          <h2 className="font-semibold">Owner:</h2> {roomData?.creatorId?.email || "Unknown"}
+        </div>
+
+        <div className="flex justify-between">
+          <div className="flex space-x-4">
+          {!participantReadyStates[session?.user?._id] && (
+            <>
+              {isParticipant && !isOnSide1 && !isOnSide2 && (
+                <>
+                  <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide1}>
+                    Join Side 1
+                  </Button>
+                  <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide2}>
+                    Join Side 2
+                  </Button>
+                </>
+              )}
+    
+              {isOnSide1 && (
+                <Button className="bg-lime-600 hover:bg-yellow-600 text-white" onClick={handleJoinSide2}>
+                  Switch to Side 2
+                </Button>
+              )}
+    
+              {isOnSide2 && (
+                <Button className="bg-lime-600 hover:bg-yellow-600 text-white" onClick={handleJoinSide1}>
+                  Switch to Side 1
+                </Button>
+              )}
+            </>
+          )}
+          </div>
+
+        <div className="flex space-x-4">
+    
+          {/* {!isParticipant && !isEveryoneReady && (
+            <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={handleJoinRoom}>
+              Back to waiting room
+            </Button>
+          )} */}
+        
+          {!isEveryoneReady && (
+            <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={handleJoinRoom}>
+              Back to waiting room
+            </Button>
+          )}
+
+          {(isParticipant || isOnSide1 || isOnSide2) && !isEveryoneReady && (
+            <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLeaveRoom}>
+              Leave Room
+            </Button>
+          )}
+        </div>
+
+        </div>
   
-        <h2 className="text-xl font-semibold mb-4">Participants to choose side:</h2>
+        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700 mt-6">
+        <h2 className="text-xl font-semibold mb-4">Participants in waiting room:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.participants.map((participant) => (
             <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
@@ -430,11 +513,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             </li>
           ))}
         </ul>
+        </div>
   
+        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-900 mt-6">
         <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.side1.length === 0 && (
-            <p>Nobody on side 1 yet.</p>
+            <p className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700">Nobody on side 1 yet.</p>
           )}
           {roomData?.side1.map((participant) => (
             <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
@@ -476,11 +561,13 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             </li>
           ))}
         </ul>
+        </div>
   
+        <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-900 mt-6">
         <h2 className="text-xl font-semibold mb-4">Side 2:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
           {roomData?.side2.length === 0 && (
-            <p>Nobody on side 2 yet.</p>
+            <p className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700">Nobody on side 2 yet.</p>
           )}
           {roomData?.side2.map((participant) => (
             <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
@@ -522,53 +609,6 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             </li>
           ))}
         </ul>
-  
-        <div className="flex space-x-4">
-        {!participantReadyStates[session?.user?._id] && (
-          <>
-            {isParticipant && !isOnSide1 && !isOnSide2 && (
-              <>
-                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide1}>
-                  Join Side 1
-                </Button>
-                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleJoinSide2}>
-                  Join Side 2
-                </Button>
-              </>
-            )}
-  
-            {isOnSide1 && (
-              <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide2}>
-                Switch to Side 2
-              </Button>
-            )}
-  
-            {isOnSide2 && (
-              <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" onClick={handleJoinSide1}>
-                Switch to Side 1
-              </Button>
-            )}
-          </>
-        )}
-  
-        {!isParticipant && !isOnSide1 && !isOnSide2 && (
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
-            Join Room
-          </Button>
-        )}
-  
-        {!isParticipant && !isEveryoneReady && (
-          <Button className="bg-gray-500 hover:bg-gray-600 text-white" onClick={handleJoinRoom}>
-            Back to waiting room
-          </Button>
-        )}
-  
-        {(isParticipant || isOnSide1 || isOnSide2) && !isEveryoneReady && (
-          <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleLeaveRoom}>
-            Leave Room
-          </Button>
-        )}
-  
         </div>
 
         {!roomData?.isStarted && (
