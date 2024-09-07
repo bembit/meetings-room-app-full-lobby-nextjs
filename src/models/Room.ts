@@ -18,9 +18,9 @@ const roomSchema = new mongoose.Schema({
   isStarted: { type: Boolean, default: false },
 
   // kicked users. timeout 30sec.
-  kickedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  // banned users. banned until meeting ends
-  bannedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  kickedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
+  // banned users. banned until meeting ends. default is empty array
+  bannedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
 });
 
 const Room = mongoose.models.Room || mongoose.model("Room", roomSchema);

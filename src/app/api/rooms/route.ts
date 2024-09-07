@@ -35,6 +35,8 @@ export async function POST(request: Request)  
       side2: [],
       readyParticipants: [],
       inviteCode: uuidv4(),
+      kickedUsers: [],
+      bannedUsers: [],
     });
     
     await newRoom.save();

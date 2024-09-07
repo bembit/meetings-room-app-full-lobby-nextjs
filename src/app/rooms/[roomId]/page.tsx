@@ -59,7 +59,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         if (!roomData || JSON.stringify(roomData) !== JSON.stringify(data)) {
           setRoomData(data);
           
-          const TIMEOUT_DURATION = 30 * 60 * 1000;
+          const TIMEOUT_DURATION = 45 * 60 * 1000;
   
           if (data.createdAt && !data.isStarted) {
             const currentTime = new Date();
@@ -248,6 +248,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       if (response.ok) {
         // Refetch room data or update the participant list locally
         await fetchRoomData();
+        const data = await response.json();
+        toast({
+          title: 'User kicked!',
+          description: data.message,
+        })
       } else {
         // ... error handling
         const data = await response.json();
@@ -428,6 +433,9 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   
         <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
+          {roomData?.side1.length === 0 && (
+            <p>Nobody on side 1 yet.</p>
+          )}
           {roomData?.side1.map((participant) => (
             <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
               <span>{participant.email}</span>
@@ -471,6 +479,9 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
   
         <h2 className="text-xl font-semibold mb-4">Side 2:</h2>
         <ul className="mb-6 flex flex-col space-y-2">
+          {roomData?.side2.length === 0 && (
+            <p>Nobody on side 2 yet.</p>
+          )}
           {roomData?.side2.map((participant) => (
             <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
               <span>{participant.email}</span>
@@ -587,6 +598,16 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         )}
   
         <Toaster />
+        <br />
+        <br />
+        <br />
+        <p>Notes to self (readme is for idiots):</p>
+        <p>-should block / disable buttons, indicate loading while waiting for database</p>
+        <p>-auto delete stops once started</p>
+        <p>-creator of room is not handled to be isParticipant yet</p>
+        <p>-for now you can redirect back from started, but won't be able to send requests</p>
+        <p>-later we can handle kick ban, now we just add kicked users to an array an leave them there</p>
+        <p>-ready check validation is off to test toast messages for other blocked routes when meeting is started</p>
       </div>
   );
 }
