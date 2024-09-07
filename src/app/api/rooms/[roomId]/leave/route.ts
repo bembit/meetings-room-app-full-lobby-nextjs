@@ -1,5 +1,3 @@
-// leave the room
-
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Room from "@/models/Room";
@@ -16,15 +14,30 @@ export async function POST(request: Request, { params }: { params: { roomId: str
 
     await dbConnect();
 
-    const room = await Room.findByIdAndUpdate(
-      params.roomId,
-      { $pull: { participants: session.user._id, side1: session.user._id, side2: session.user._id, readyParticipants: { userId: session.user._id } } },
-      { new: true }
-    );
+    const room = await Room.findById(params.roomId);
 
     if (!room) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
+
+    // Check if the room has started before trying to leave
+    if (room.isStarted) {
+      return NextResponse.json({ error: 'Room started, cannot leave' }, { status: 403 });
+    }
+
+    // If the room has not started, allow the user to leave
+    await Room.findByIdAndUpdate(
+      params.roomId,
+      { 
+        $pull: { 
+          participants: session.user._id, 
+          side1: session.user._id, 
+          side2: session.user._id, 
+          readyParticipants: { userId: session.user._id } 
+        } 
+      },
+      { new: true }
+    );
 
     return NextResponse.json({ message: "Left room successfully" });
   } catch (error) {

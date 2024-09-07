@@ -21,7 +21,13 @@ export async function DELETE(request: Request, { params }: { params: { roomId: s
     }
 
     if (room.creatorId.toString() !== session.user._id) {
-      return new Response("Forbidden - Only the room creator can delete the room", { status: 403 });
+      // return new Response("Forbidden - Only the room creator can delete the room", { status: 403 });
+      return NextResponse.json("Forbidden - Only the room creator can delete the room", { status: 403 });
+    }
+
+    if (room.isStarted) {
+      // return new Response("Forbidden - Room is started, cannot be deleted", { status: 403 });
+      return NextResponse.json({ error: "Room started, cannot delete" }, { status: 403 });
     }
 
     await room.deleteOne();

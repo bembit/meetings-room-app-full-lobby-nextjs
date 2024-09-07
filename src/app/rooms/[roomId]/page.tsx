@@ -21,7 +21,9 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
   const [participantReadyStates, setParticipantReadyStates] = useState<Record<string, boolean>>({});
 
-  const [elapsedTime, setElapsedTime] = useState(0); // State to track elapsed time in seconds
+  // const [elapsedTime, setElapsedTime] = useState(0); // State to track elapsed time in seconds
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null); 
+
 
   const handleGenerateInviteLink = () => {
     const inviteLink = `${window.location.origin}/api/invite/${roomData.inviteCode}`;
@@ -41,29 +43,43 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
 
   const fetchRoomData = async () => {
     try {
-      if (!session) { // Check if session is available
+      if (!session) { 
         router.push("/");
         return;
       }
-
+  
       const response = await fetch(`/api/rooms/${params.roomId}`);
       if (response.ok) {
         const data = await response.json();
-        setRoomData(data);
-        setIsParticipant(
-          data.participants.some(
-            // (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
-            (participant) => participant._id.toString() === session.user._id // id _id id _id id _id
-          )
-        );
-
-        // Initialize participantReadyStates based on readyParticipants from the server
-        const initialReadyStates: Record<string, boolean> = {};
-        data.readyParticipants.forEach((participant) => {
-          initialReadyStates[participant.userId.toString()] = participant.isReady;
-        });
-        setParticipantReadyStates(initialReadyStates);
-
+        
+        // Only update room data if it's different from the current roomData
+        if (!roomData || JSON.stringify(roomData) !== JSON.stringify(data)) {
+          setRoomData(data);
+          
+          const TIMEOUT_DURATION = 1 * 60 * 1000;
+  
+          if (data.createdAt && !data.isStarted) {
+            const currentTime = new Date();
+            const createdAt = new Date(data.createdAt);
+            const elapsedMilliseconds = currentTime - createdAt;
+            const timeRemainingMilliseconds = TIMEOUT_DURATION - elapsedMilliseconds;
+  
+            // Only update timeRemaining if it differs from the current value
+            const calculatedTimeRemaining = Math.max(0, Math.floor(timeRemainingMilliseconds / 1000));
+            if (calculatedTimeRemaining !== timeRemaining) {
+              setTimeRemaining(calculatedTimeRemaining);
+            }
+          } else {
+            setTimeRemaining(null);
+          }
+  
+          // Update participant ready states
+          const initialReadyStates = {};
+          data.readyParticipants.forEach(participant => {
+            initialReadyStates[participant.userId.toString()] = participant.isReady;
+          });
+          setParticipantReadyStates(initialReadyStates);
+        }
       } else {
         setError("Failed to fetch room data.");
       }
@@ -74,6 +90,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       setIsLoading(false);
     }
   };
+  
 
   const checkReadiness = async () => {
     try {
@@ -143,6 +160,27 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
     }
   }, [params.roomId, session, router, status]); 
 
+  // Update timeRemaining every second
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    // Prevent the timer or room deletion if the room has started
+    if (roomData && !roomData.isStarted && timeRemaining !== null && timeRemaining > 0) {
+      intervalId = setInterval(() => {
+        setTimeRemaining((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeRemaining === 0 && !roomData.isStarted) {
+      // Timer expired, handle room deletion only if room has not started
+      handleDeleteRoom();
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+
+    }, [timeRemaining, roomData]);
 
   const handleJoinRoom = async () => {
     try {
@@ -303,6 +341,16 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleDeleteRoom}>
             Delete Room
           </Button>
+        )}
+
+        {/* Display the countdown timer if the room is not started */}
+        {!roomData?.isStarted && timeRemaining !== null && (
+          <p>Time remaining: {formatElapsedTime(timeRemaining)}</p>
+        )}
+
+        {/* Display a message when the room has started */}
+        {roomData?.isStarted && (
+          <p>Room started, timer stopped.</p>
         )}
   
         <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-700">
@@ -483,4 +531,11 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         <Toaster />
       </div>
   );
+}
+
+// Helper function to format elapsed time
+function formatElapsedTime(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 }
