@@ -67,7 +67,7 @@ export function NavigationMenuDemo() {
 
   return (
     <NavigationMenu>
-      <NavigationMenuList>
+      <NavigationMenuList className="flex-wrap">
 
         <NavigationMenuItem>
           <Link href="/" legacyBehavior passHref>
