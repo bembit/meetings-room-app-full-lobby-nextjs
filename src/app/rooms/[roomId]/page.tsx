@@ -414,31 +414,34 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
             <h2 className="text-xl font-semibold mb-2">Room Size:<span className="text-orange-700 hover:text-orange-700 ml-2">{roomData?.roomSize}</span></h2>
           </div>
     
-          {/* <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white">
-            Secret Button
-          </Button> */}
 
-          {!isParticipant && !isOnSide1 && !isOnSide2 && (
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
-              Join Room
+          <div className="flex flex-row flex-wrap">
+            {/* <Button className="mb-4 bg-red-500 hover:bg-red-600 text-white">
+              Secret Button
+            </Button> */}
+
+            {!isParticipant && !isOnSide1 && !isOnSide2 && (
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleJoinRoom}>
+                Join Room
+              </Button>
+            )}
+
+            {isParticipant && !isOnSide1 && !isOnSide2 && (
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
+              Copy Invite Link
             </Button>
-          )}
+            )}
 
-          {isParticipant && !isOnSide1 && !isOnSide2 && (
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleGenerateInviteLink}>
-            Copy Invite Link
-          </Button>
-          )}
-
-          {(session?.user?._id === roomData?.creatorId?._id) && !isEveryoneReady && (
-            <ConfirmationDialog
-              title="Delete Room"
-              description="Are you sure you want to delete this room? This action cannot be undone."
-              onConfirm={handleDeleteRoom}
-              confirmText="Delete Room"
-              cancelText="Cancel"
-            />
-          )}
+            {(session?.user?._id === roomData?.creatorId?._id) && !isEveryoneReady && (
+              <ConfirmationDialog
+                title="Delete Room"
+                description="Are you sure you want to delete this room? This action cannot be undone."
+                onConfirm={handleDeleteRoom}
+                confirmText="Delete Room"
+                cancelText="Cancel"
+              />
+            )}
+          </div>
 
         </div>
   
@@ -446,7 +449,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
           <h2 className="font-semibold">Owner:</h2> {roomData?.creatorId?.email || "Unknown"}
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-wrap">
           <div className="flex space-x-4">
           {!participantReadyStates[session?.user?._id] && (
             <>
@@ -516,51 +519,51 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         </div>
   
         <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-900 mt-6">
-        <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
-        <ul className="mb-6 flex flex-col space-y-2">
-          {roomData?.side1.length === 0 && (
-            <p className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700">Nobody on side 1 yet.</p>
-          )}
-          {roomData?.side1.map((participant) => (
-            <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
-              <span>{participant.email}</span>
-              <span className="ml-4">
-                {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
-              </span>
-              {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
-                <Button className="ml-4 bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
-                  Kick
-                </Button>
-              )}
-              {participant._id.toString() === session?.user?._id && (
-                <label className="relative inline-block">
-                <input
-                  type="checkbox"
-                  checked={participantReadyStates[participant._id.toString()] || false}
-                  onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
-                  className="appearance-none h-6 w-6 border border-gray-300 rounded-md cursor-pointer bg-red-500 border-red-500 checked:bg-green-500 checked:border-green-500 focus:outline-none"
-                />
-                {/* Green checkmark for the ready state */}
-                <span
-                  className={`absolute left-1 top-1 text-white text-xs ${
-                    participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
-                  }`}
-                >
-                  ✓
+          <h2 className="text-xl font-semibold mb-4">Side 1:</h2>
+          <ul className="mb-6 flex flex-col space-y-2">
+            {roomData?.side1.length === 0 && (
+              <p className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700">Nobody on side 1 yet.</p>
+            )}
+            {roomData?.side1.map((participant) => (
+              <li className="flex justify-between items-center bg-slate-200 p-4 rounded-lg dark:bg-slate-700" key={participant._id.toString()}>
+                <span>{participant.email}</span>
+                <span className="ml-4">
+                  {participantReadyStates[participant._id.toString()] ? "Ready" : "Not Ready"}
                 </span>
-                {/* Red X for the not ready state */}
-                <span
-                  className={`absolute left-1 top-1 text-white text-xs ${
-                    !participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
-                  }`}
-                >
-                  ✕
-                </span>
-                </label>
-              )}
-            </li>
-          ))}
-        </ul>
+                {session?.user?._id === roomData?.creatorId?._id && participant._id.toString() !== session?.user?._id && (
+                  <Button className="ml-4 bg-red-500 hover:bg-red-600 text-white" onClick={() => handleKickUser(participant._id.toString())}>
+                    Kick
+                  </Button>
+                )}
+                {participant._id.toString() === session?.user?._id && (
+                  <label className="relative inline-block">
+                  <input
+                    type="checkbox"
+                    checked={participantReadyStates[participant._id.toString()] || false}
+                    onChange={(e) => handleReadyStateChange(participant._id.toString(), e.target.checked)}
+                    className="appearance-none h-6 w-6 border border-gray-300 rounded-md cursor-pointer bg-red-500 border-red-500 checked:bg-green-500 checked:border-green-500 focus:outline-none"
+                  />
+                  {/* Green checkmark for the ready state */}
+                  <span
+                    className={`absolute left-1 top-1 text-white text-xs ${
+                      participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
+                    }`}
+                  >
+                    ✓
+                  </span>
+                  {/* Red X for the not ready state */}
+                  <span
+                    className={`absolute left-1 top-1 text-white text-xs ${
+                      !participantReadyStates[participant._id.toString()] ? 'block' : 'hidden'
+                    }`}
+                  >
+                    ✕
+                  </span>
+                  </label>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
   
         <div className="mb-6 p-4 bg-slate-200 rounded-lg dark:bg-slate-900 mt-6">
@@ -638,16 +641,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
         )}
   
         <Toaster />
-        <br />
-        <br />
-        <br />
-        <p>Notes to self (readme is for idiots):</p>
-        <p>-should block / disable buttons, indicate loading while waiting for database</p>
-        <p>-auto delete stops once started</p>
-        <p>-creator of room is not handled to be isParticipant yet</p>
-        <p>-for now you can redirect back from started, but won't be able to send requests</p>
-        <p>-later we can handle kick ban, now we just add kicked users to an array an leave them there</p>
-        <p>-ready check validation is off to test toast messages for other blocked routes when meeting is started</p>
+        
       </div>
   );
 }
