@@ -21,6 +21,9 @@
 
 - [ ] auto delete room should be handled by the server, and not the hacky creator calls the already existing delete handler.:D blizzcon demo code
 
+- [ ] isInvited? check if user is invited to the room? how.
+
+- buttons conditional renders are all over the place.
 
 -should block / disable buttons, indicate loading while waiting for database
 -auto delete stops once started
