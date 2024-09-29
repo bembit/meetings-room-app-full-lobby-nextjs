@@ -52,8 +52,8 @@ export default function RoomsPage() {
       <h1 className="text-3xl font-bold mb-4">Available Rooms</h1>
       <ul>
         {rooms.map((room) => (
-          <Link href={`/rooms/${room._id}`} passHref legacyBehavior>
-            <li key={room._id} className='p-4 border border-gray-200 mb-2 rou'>
+          <Link key={room._id} href={`/rooms/${room._id}`} passHref legacyBehavior>
+            <li className='p-4 border border-gray-200 mb-2 rou'>
                 <>
                   <p>Room Name: {room.name}</p>
                   <p>Created by:</p> {/* Display creator's email */}

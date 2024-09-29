@@ -193,10 +193,8 @@ export default function CreateRoom() {
               )}
             />
 
-            <p>with more data we could create previous, like a recurring meeting "invite last participants".</p>
-
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Büntetőjogi felelősségem tudatában kijelentem, hogy szobát szeretnék csinálni."}
+              {isLoading ? "Creating..." : "Create Room"}
             </Button>
           </form>
         </Form>

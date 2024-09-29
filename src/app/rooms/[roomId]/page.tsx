@@ -165,7 +165,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       // Clean up the interval on component unmount
       return () => clearInterval(intervalId);
     }
-  }, [params.roomId, session, router, status]); 
+  }, [params.roomId, session, router, status, fetchRoomData]); 
 
   // Update timeRemaining every second
   useEffect(() => {
@@ -178,7 +178,7 @@ export default function RoomPage({ params }: { params: { roomId: string } }) {
       }, 1000);
     } else if (timeRemaining === 0 && !roomData.isStarted) {
       // Timer expired, handle room deletion only if room has not started
-      handleDeleteRoom();
+      // handleDeleteRoom();
     }
 
     return () => {

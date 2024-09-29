@@ -99,8 +99,7 @@ export default function Home() {
                 </Button>
               </form>
 
-              <p className="mt-4">
-                {/* escape apostrophe */}
+              {/* <p className="mt-4">
                 Don&apos;t have an account?{" "}
                 <Button
                   onClick={handleRegister}
@@ -108,7 +107,7 @@ export default function Home() {
                 >
                   Register
                 </Button>
-              </p>
+              </p> */}
             </>
         ) : (
           <p>You are already logged in!</p>
